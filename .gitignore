@@ -1,0 +1,54 @@
+# Rust build artifacts
+runtime/target/
+
+# Model weights (8.4 MB, re-downloadable from Hugging Face; see MODEL.md)
+*.onnx
+!runtime/**/*.onnx
+
+# Golden tensors for the differential test (~3.4 GB for three lengths).
+# Regenerate with:
+#   python scripts/dump_golden.py paradee_int8.onnx golden
+# before running `cargo test`.
+golden/
+golden_short/
+golden_long/
+*.npy
+
+# Scratch / debug dumps
+probe*.onnx
+runtime/out.txt
+runtime/out.wav
+runtime/my_*.txt
+runtime/bt.txt
+runtime/node_diff.csv
+out.wav
+scripts/_*.py
+scripts/_*.rs
+scripts/_*.exe
+scripts/_*.pdb
+scripts/_*.json
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Scratch outputs
+samples/_*.wav
+scripts/*.exe
+scripts/*.pdb
+scripts/liveness.json
+
+# Generated audio samples (timestamped). Not tracked.
+audio_out/
+
+# Interleaved A/B benchmark worktrees and their target dirs
+.abwork/
+docs/ab_last.json
+
+# Instructions for AI coding agents. Not part of the published repository.
+AGENTS.md

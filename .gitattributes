@@ -1,0 +1,14 @@
+# Normalize line endings in the repository. Without this, a Windows checkout
+# commits CRLF and a Linux checkout sees every line as changed.
+* text=auto eol=lf
+
+# Binary assets must not be touched.
+*.wav binary
+*.onnx binary
+*.npy binary
+*.png binary
+*.ico binary
+
+# Windows-only scripts keep CRLF.
+*.bat text eol=crlf
+*.ps1 text eol=crlf

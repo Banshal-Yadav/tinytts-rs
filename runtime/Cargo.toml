@@ -1,0 +1,24 @@
+[package]
+name = "paradee-rt"
+version = "0.1.0"
+edition = "2021"
+description = "A from-scratch ONNX runtime specialized for the Paradee-8M v1.1 int8 TTS model"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Banshal-Yadav/paradee-rt"
+readme = "../README.md"
+keywords = ["onnx", "tts", "inference", "simd"]
+categories = ["multimedia::audio"]
+exclude = ["../golden*", "../*.onnx"]
+
+[lib]
+name = "paradee_rt"
+path = "src/lib.rs"
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
