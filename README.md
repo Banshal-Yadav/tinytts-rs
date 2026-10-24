@@ -53,6 +53,11 @@ unless stated. 52-token input, 3.425 s of audio at 24 kHz.
 | RSS while loaded | 82 MB | 82 MB | **24 MB** |
 | peak RSS | 230 MB | 230 MB | **79 MB** |
 
+(The 79 MB peak is from the interleaved A/B benchmark session; the
+fresh-process table below measures 42.7 MB for the same input. Both are
+reported because they answer different questions — head-to-head ratio vs
+absolute floor.)
+
 Load is **77x faster** and peak memory is **2.9x smaller**. Synthesis is
 **4.0x slower** than ORT on one thread.
 
@@ -127,6 +132,8 @@ See `MODEL.md` for the source, license and attribution.
 cd runtime
 cargo build --release
 ./target/release/tinytts ../paradee_int8.onnx 0 16 43 44 45 16 4 0
+# Windows (PowerShell):
+.\target\release\tinytts.exe ..\paradee_int8.onnx 0 16 43 44 45 16 4 0
 ```
 
 The trailing numbers are phoneme token ids (see above). The model takes
