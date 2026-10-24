@@ -1,4 +1,4 @@
-//! A from-scratch ONNX runtime specialized for the Paradee-8M v1.1 int8 TTS
+//! A from-scratch ONNX runtime specialized for one small int8 text-to-speech
 //! model. No dependencies: the protobuf reader, graph loader, tensor type and
 //! every op kernel are implemented here.
 //!
@@ -24,6 +24,11 @@
 // round-trips would change the numerics.
 #![allow(clippy::excessive_precision)]
 
+pub mod alloc;
+pub mod exec;
+pub mod fuse;
+pub mod graph;
+pub mod kernels;
 pub mod onnx;
 pub mod pb;
 pub mod quant;
