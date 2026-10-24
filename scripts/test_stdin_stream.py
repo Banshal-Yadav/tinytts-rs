@@ -35,7 +35,7 @@ def main() -> None:
     for ch in TEXT:
         proc.stdin.write(ch)
         proc.stdin.flush()
-        time.sleep(0.004)  # ~250 chars/sec, roughly a fast LLM
+        time.sleep(0.004)  # ~250 chars/sec, roughly a fast token stream
     proc.stdin.close()
 
     for line in proc.stdout:
