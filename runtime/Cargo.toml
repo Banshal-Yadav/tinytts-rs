@@ -1,18 +1,22 @@
 [package]
-name = "paradee-rt"
+name = "tinytts-rs"
 version = "0.1.0"
 edition = "2021"
-description = "A from-scratch ONNX runtime specialized for the Paradee-8M v1.1 int8 TTS model"
+description = "A from-scratch ONNX runtime specialized for one small int8 text-to-speech model"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/Banshal-Yadav/paradee-rt"
+repository = "https://github.com/Banshal-Yadav/tinytts-rs"
 readme = "../README.md"
 keywords = ["onnx", "tts", "inference", "simd"]
 categories = ["multimedia::audio"]
 exclude = ["../golden*", "../*.onnx"]
 
 [lib]
-name = "paradee_rt"
+name = "tinytts"
 path = "src/lib.rs"
+
+[[bin]]
+name = "tinytts"
+path = "src/main.rs"
 
 [dependencies]
 
