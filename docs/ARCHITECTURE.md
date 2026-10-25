@@ -90,7 +90,7 @@ make it cheap:
 
 **Liveness freeing.** Before the loop, one pass computes the last consumer index
 of every tensor. After each node runs, any input whose last use was this step is
-removed from `vals`. This is what keeps peak RSS at 79 MB instead of 417 MB.
+removed from `vals`. This is what keeps peak RSS at 46 MB instead of 417 MB.
 
 **Lazy dequantization.** A `Dequant` node stores its int8 payload plus scale and
 zero-point. `Exec::eval` expands it to f32 only when a consumer actually needs

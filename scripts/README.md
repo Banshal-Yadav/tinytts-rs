@@ -25,7 +25,7 @@ The typical flow:
 
 ```bash
 python scripts/user/setup_model.py
-python scripts/user/say.py "Hello there." -o out.wav
+python scripts/user/say.py "Hello there." --no-play --keep out.wav
 ```
 
 `say.py` and `speak.py` need the Python phonemizer (the `paradee` package in

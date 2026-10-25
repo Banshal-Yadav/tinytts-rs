@@ -192,7 +192,7 @@ memory; the full kernel is well below that.
 
 ## 3. Memory
 
-Peak RSS went from 417 MB to 79 MB. Four changes, in order of size.
+Peak RSS went from 417 MB to 46 MB. Four changes, in order of size.
 
 ### Liveness-based freeing
 
@@ -321,7 +321,7 @@ twiddles.
 
 ## 7. Load time
 
-Load is 7.9 ms against ORT's 610.5 ms.
+Load is 12.1 ms against ORT's 610.5 ms.
 
 **`fuse_elem_chain` was O(n^2).** It rebuilt the consumer map over all 2529
 nodes on every iteration, 89 times: 48.6 ms. Building the map once and

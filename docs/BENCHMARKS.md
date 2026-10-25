@@ -25,14 +25,15 @@ alternately in one session and reports only the ratio.
 
 | | ONNX Runtime 1T | ONNX Runtime 4T | this runtime |
 |---|---:|---:|---:|
-| load | 610.5 ms | — | **7.9 ms** |
-| synth (median) | 93.0 ms | 54.9 ms | 371.4 ms |
-| real-time factor | 36.8x | 62.4x | 9.2x |
-| RSS while loaded | 82 MB | 82 MB | **24 MB** |
-| peak RSS | 230 MB | 230 MB | **79 MB** |
+| load | 610.5 ms | — | **12.1 ms** |
+| synth (median) | 93.0 ms | 54.9 ms | 270.3 ms |
+| real-time factor | 36.8x | 62.4x | 12.7x |
+| RSS while loaded | 82 MB | 82 MB | **16 MB** |
+| peak RSS | 226 MB | 226 MB | **46 MB** |
 
-Load is **77x faster**, peak memory **2.9x smaller**, synthesis **4.0x slower**
-than ORT on one thread.
+Load is **50x faster**, peak memory **4.9x smaller**, synthesis **2.9x slower**
+than ORT on one thread. Both runtimes measured in one session, one fresh
+process per run, median of 5.
 
 ORT's own profiler is not usable for absolute numbers: enabling it inflates the
 wall clock from 96.1 to 147.8 ms (1.54x) and the kernel sum comes to 12x the
@@ -46,9 +47,9 @@ Fresh process per measurement, one load and one run each.
 
 | input | tokens | audio | loaded RSS | peak LIVE | peak RSS | synth p50 |
 |---|---:|---:|---:|---:|---:|---:|
-| short | 13 | 0.93 s | 15.6 MB | 13.3 MB | 30.5 MB | 112.9 ms |
-| mid | 52 | 3.43 s | 15.8 MB | 25.3 MB | 42.7 MB | 249.0 ms |
-| long | 512 | 30.30 s | 15.7 MB | 148.5 MB | 166.1 MB | 1920.9 ms |
+| short | 13 | 0.93 s | 15.7 MB | 13.3 MB | 30.3 MB | 109.6 ms |
+| mid | 52 | 3.43 s | 15.6 MB | 25.3 MB | 42.6 MB | 244.4 ms |
+| long | 512 | 30.30 s | 15.7 MB | 148.5 MB | 166.1 MB | 1861.0 ms |
 
 "peak LIVE" is the counting allocator's high-water mark; "peak RSS" is the
 process working set. The gap between them is allocator and stack overhead.
