@@ -54,3 +54,7 @@ docs/benchmark.json
 
 # Instructions for AI coding agents. Not part of the published repository.
 AGENTS.md
+
+# tinytts-g2p embedded lexicon (12.8 MB, generated). Regenerate with:
+#   python g2p/gen_lexicon.py g2p/src/lexicon.bin
+g2p/src/lexicon.bin

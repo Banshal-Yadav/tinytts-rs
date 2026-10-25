@@ -8,15 +8,19 @@ This crate embeds lexical data from the following sources. The runtime crate
 - Files: `us_gold.json`, `us_silver.json` (embedded here in compiled form as
   `src/lexicon.bin`)
 - Source: the `misaki` Python package, <https://github.com/hexgrad/misaki>,
-  PyPI `misaki==0.9.4`
-- License: Apache License 2.0. The full license text ships with the misaki
-  package and is available at <https://www.apache.org/licenses/LICENSE-2.0>.
-- Provenance note: the gold and silver lexicons are distributed inside the
-  misaki package as `misaki/data/us_gold.json` and `misaki/data/us_silver.json`.
-  The misaki repository does not carry a separate provenance statement for
-  these two files beyond the package-level Apache-2.0 license; they are
-  treated as part of misaki itself. If a future misaki release states a
-  different origin for these files, this notice must be updated before the
+  PyPI `misaki==0.9.4`, files at `misaki/data/us_gold.json` and
+  `misaki/data/us_silver.json`
+- License: Apache License 2.0 (the repo-level LICENSE at hexgrad/misaki;
+  verified against the upstream repository on 2026-10-25). The full text is
+  at <https://www.apache.org/licenses/LICENSE-2.0>.
+- Provenance: the gold and silver lexicons are distributed inside the misaki
+  package with no separate data-level license or attribution file. The
+  content is a curated English pronunciation dictionary in misaki's own
+  IPA-derived notation (capital-letter diphthong symbols, stress marks,
+  reduction vowels). No third-party notice is embedded in the data files
+  themselves. They are treated as part of misaki, covered by the package's
+  Apache-2.0 license. If a future misaki release states a different origin
+  or license for these files, this notice must be updated before the
   embedded copy is regenerated.
 
 ## CMUdict
@@ -57,7 +61,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 ## Regeneration
 
-The embedded blob is regenerated with:
+The embedded blob is NOT committed to git (it is 12.8 MB and regenerable).
+Before building the crate, generate it with:
 
 ```
 python g2p/gen_lexicon.py g2p/src/lexicon.bin
@@ -65,4 +70,6 @@ python g2p/gen_lexicon.py g2p/src/lexicon.bin
 
 which reads the two misaki JSON files from the Python environment and
 `cmudict.dict` from the spike folder. Any regeneration must re-check the
-upstream sources for license changes before the new blob is committed.
+upstream sources for license changes before the new blob is used. The
+committed state records the exact generator and its inputs; the blob itself
+is a build artifact.
