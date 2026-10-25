@@ -1,6 +1,6 @@
 //! Per-node differential test against ONNX Runtime golden tensors.
 //!
-//! Golden files are produced once by `scripts/dump_golden.py` (see docs/TESTING.md).
+//! Golden files are produced once by `scripts/verify/dump_golden.py` (see docs/TESTING.md).
 //! This test needs neither Python nor onnxruntime at run time.
 //!
 //! Two modes:
@@ -54,7 +54,7 @@ impl Golden {
         let manifest = json::parse(&std::fs::read_to_string(&mpath).unwrap_or_else(|e| {
             panic!(
                 "cannot read {mpath}: {e}\n\
-                 Run:  python scripts/dump_golden.py paradee_int8.onnx golden"
+                 Run:  python scripts/verify/dump_golden.py paradee_int8.onnx golden"
             )
         }));
         let tensors = json::tensors(&manifest);
