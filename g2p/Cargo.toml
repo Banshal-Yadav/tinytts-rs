@@ -1,0 +1,29 @@
+[package]
+name = "tinytts-g2p"
+version = "0.1.0"
+edition = "2021"
+description = "Grapheme-to-phoneme conversion for tinytts: text to misaki phoneme strings"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Banshal-Yadav/tinytts-rs"
+readme = "../README.md"
+keywords = ["tts", "g2p", "phonemes"]
+categories = ["text-processing"]
+
+[lib]
+name = "tinytts_g2p"
+path = "src/lib.rs"
+
+[[bin]]
+name = "g2p"
+path = "src/main.rs"
+
+# Zero dependencies: the lexicon is embedded static data and every lookup is
+# std-only. This crate is optional for the runtime; tinytts-rs itself never
+# depends on it.
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
