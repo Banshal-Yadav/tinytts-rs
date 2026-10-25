@@ -1,5 +1,7 @@
 # tinytts-rs
 
+![tinytts-rs banner](assets/TinyTTS-RS-Signal-Synthesis-Banner.png)
+
 A from-scratch ONNX inference runtime in Rust, specialized for one model: a
 7.88M-parameter int8 text-to-speech network.
 
@@ -16,6 +18,16 @@ reject anything else rather than silently produce wrong numbers.
 
 ONNX Runtime synthesizes 3-4x faster; this runtime loads in 8 ms instead of 610,
 runs in 79 MB instead of 230, and needs nothing but a Rust compiler.
+
+## Two files. That's the whole system.
+
+| file | size | what |
+|---|---:|---|
+| `tinytts` binary | **542 KB** | the runtime, statically linked, zero dependencies |
+| `paradee_int8.onnx` | **8.1 MB** | the model, downloaded from Hugging Face |
+
+**8.6 MB total** — smaller than one MP3. No Python, no ONNX Runtime, no DLLs,
+no config. Copy both files to any x86-64 machine and it speaks.
 
 ## Input is phoneme ids, not text
 
