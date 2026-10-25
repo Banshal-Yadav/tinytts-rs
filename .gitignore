@@ -50,6 +50,7 @@ audio_out/
 # Interleaved A/B benchmark worktrees and their target dirs
 .abwork/
 docs/ab_last.json
+docs/benchmark.json
 
 # Instructions for AI coding agents. Not part of the published repository.
 AGENTS.md
