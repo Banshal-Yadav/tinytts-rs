@@ -16,8 +16,8 @@ It is a **single-model runtime**, not a general ONNX engine. It implements the
 56 op types this graph uses, with the shapes and dtypes this graph uses. It will
 reject anything else rather than silently produce wrong numbers.
 
-ONNX Runtime synthesizes 3-4x faster; this runtime loads in 8 ms instead of 610,
-runs in 79 MB instead of 230, and needs nothing but a Rust compiler.
+ONNX Runtime synthesizes 3-4x faster; this runtime loads in 12 ms instead of 610,
+runs in 46 MB instead of 226, and needs nothing but a Rust compiler.
 
 ## Two files. That's the whole system.
 
@@ -47,7 +47,7 @@ A 512-token paragraph from `text/long_text.txt`, default chunking.
 32.1 s of audio, synthesized in **2.2 s** (14.6x realtime).
 
 Both on one core of an AMD Ryzen 7 7735HS laptop chip, single thread, after
-an **8 ms** load. Full machine specs and methodology below.
+a **12 ms** load. Full machine specs and methodology below.
 
 Regenerate with `python scripts/user/gen_audio.py`.
 
@@ -81,19 +81,17 @@ unless stated. 52-token input, 3.425 s of audio at 24 kHz.
 
 | | ONNX Runtime 1 thread | ONNX Runtime 4 threads | this runtime |
 |---|---:|---:|---:|
-| load | 610.5 ms | - | **7.9 ms** |
-| synth (p50) | 93.0 ms | 54.9 ms | 371.4 ms |
-| real-time factor | 36.8x | 62.4x | 9.2x |
-| RSS while loaded | 82 MB | 82 MB | **24 MB** |
-| peak RSS | 230 MB | 230 MB | **79 MB** |
+| load | 610.5 ms | - | **12.1 ms** |
+| synth (p50) | 93.0 ms | 54.9 ms | 270.3 ms |
+| real-time factor | 36.8x | 62.4x | 12.7x |
+| RSS while loaded | 82 MB | 82 MB | **16 MB** |
+| peak RSS | 226 MB | 226 MB | **46 MB** |
 
-(The 79 MB peak is from the interleaved A/B benchmark session; the
-fresh-process table below measures 42.7 MB for the same input. Both are
-reported because they answer different questions: head-to-head ratio vs
-absolute floor.)
+Both runtimes were measured in the same session with the same script
+(`scripts/verify/benchmark.py`), one fresh process per run, median of 5.
 
-Load is **77x faster** and peak memory is **2.9x smaller**. Synthesis is
-**4.0x slower** than ORT on one thread.
+Load is **50x faster** and peak memory is **4.9x smaller**. Synthesis is
+**2.9x slower** than ORT on one thread.
 
 Methodology: `scripts/verify/benchmark.py` for the head-to-head, `scripts/bench/rss_fresh.py`
 for memory (one fresh process per measurement, so the RSS high-water mark is not
@@ -109,9 +107,9 @@ Fresh process per measurement, one load and one run each.
 
 | input | tokens | audio | loaded RSS | peak LIVE | peak RSS | synth p50 |
 |---|---:|---:|---:|---:|---:|---:|
-| short | 13 | 0.93 s | 15.6 MB | 13.3 MB | 30.5 MB | 112.9 ms |
-| mid | 52 | 3.43 s | 15.8 MB | 25.3 MB | 42.7 MB | 249.0 ms |
-| long | 512 | 30.30 s | 15.7 MB | 148.5 MB | 166.1 MB | 1920.9 ms |
+| short | 13 | 0.93 s | 15.7 MB | 13.3 MB | 30.3 MB | 109.6 ms |
+| mid | 52 | 3.43 s | 15.6 MB | 25.3 MB | 42.6 MB | 244.4 ms |
+| long | 512 | 30.30 s | 15.7 MB | 148.5 MB | 166.1 MB | 1861.0 ms |
 
 Loaded RSS is flat at ~15.7 MB regardless of input length: that is the model
 weights plus the runtime. Peak scales with the input because the vocoder's
@@ -133,8 +131,8 @@ is why it is opt-in above 100 tokens rather than always on.
 ### Improvement over the naive baseline
 
 The first working version of this runtime, before any optimization, ran the same
-52-token input in **6617 ms** with a **417 MB** peak RSS. It is now 371 ms and
-79 MB: **17.8x faster** and **5.3x smaller**. The wins, in order of size:
+52-token input in **6617 ms** with a **417 MB** peak RSS. It is now 270 ms and
+46 MB: **24.5x faster** and **9.1x smaller**. The wins, in order of size:
 
 | change | effect |
 |---|---|
@@ -143,7 +141,7 @@ The first working version of this runtime, before any optimization, ran the same
 | AVX2+FMA SGEMM + im2col conv | 2725 -> 1092 ms |
 | elementwise broadcast fast paths | 1092 -> 721 ms |
 | liveness-based buffer freeing | peak RSS 417 -> 126 MB |
-| fuse the `/head` sine-excitation chain | 676 -> 567 ms, RSS 126 -> 79 MB |
+| fuse the `/head` sine-excitation chain | 676 -> 567 ms, RSS 126 -> 80 MB |
 | lazy dequantization, refcounted tensor data | loaded RSS 31.8 -> 15.4 MB |
 
 `docs/PERFORMANCE_NOTES.md` has the full record, including what was tried and
@@ -234,12 +232,12 @@ Plus four fused ops the graph rewriter creates: `Dequant`, `ElemChain`,
 
 ## Why this runtime
 
-- Loads in **8 ms**, not 610 ms (77x faster than ONNX Runtime)
-- **79 MB** peak memory, not 230 MB
+- Loads in **12 ms**, not 610 ms (50x faster than ONNX Runtime)
+- **46 MB** peak memory, not 226 MB
 - **542 KB** static binary, zero dependencies, no DLLs
 - **8.6 MB** total: binary + model, smaller than one MP3
 - **9-14x realtime** on a single laptop core, faster than you can listen
-- **17.8x faster** and **5.3x smaller** than the naive first version
+- **24.5x faster** and **9.1x smaller** than the naive first version
 - Chunked streaming: first audio in **370 ms** on a 30 s paragraph
 
 ## Tests
