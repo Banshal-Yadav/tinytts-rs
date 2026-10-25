@@ -6,7 +6,7 @@ bisect a wrong waveform.
 
 ## Golden tensors
 
-`scripts/dump_golden.py` runs ONNX Runtime once with every node output exposed as
+`scripts/verify/dump_golden.py` runs ONNX Runtime once with every node output exposed as
 a graph output, and writes:
 
 - `golden/t<NNNN>.npy` — one file per tensor, named by manifest index
@@ -23,13 +23,13 @@ Golden data is **not committed** — it is ~3.4 GB for three input lengths.
 Regenerate it once:
 
 ```bash
-python scripts/dump_golden.py paradee_int8.onnx golden          # 52-token
-IDS="..." python scripts/dump_golden.py paradee_int8.onnx golden_short
-IDS="..." python scripts/dump_golden.py paradee_int8.onnx golden_long
+python scripts/verify/dump_golden.py paradee_int8.onnx golden          # 52-token
+IDS="..." python scripts/verify/dump_golden.py paradee_int8.onnx golden_short
+IDS="..." python scripts/verify/dump_golden.py paradee_int8.onnx golden_long
 ```
 
-The three inputs are the ones `scripts/_ids.py` uses, so every benchmark script
-and the test agree on what "short", "mid" and "long" mean.
+The three inputs are fixed ids shared by every benchmark script and the test, so
+they agree on what "short", "mid" and "long" mean.
 
 After that the test needs neither Python nor onnxruntime.
 
@@ -71,8 +71,8 @@ node that fails in every configuration.
 ## The gate
 
 ```bash
-python scripts/gate.py          # all three lengths
-python scripts/gate.py short    # one
+python scripts/verify/gate.py          # all three lengths
+python scripts/verify/gate.py short    # one
 ```
 
 Runs `full_graph` against each golden dir and prints PASS/FAIL with the

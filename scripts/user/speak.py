@@ -13,7 +13,7 @@ import soundfile as sf
 
 from paradee import SAMPLE_RATE, Paradee
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SAMPLES = os.path.join(ROOT, "samples")
 
 

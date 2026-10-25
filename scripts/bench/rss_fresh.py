@@ -7,7 +7,7 @@ high-water mark is not contaminated by an earlier run.
 The three inputs are the ones the golden dumper uses, read from the golden
 manifests so this script and the differential test always agree.
 
-Usage:  python scripts/rss_fresh.py [runs]
+Usage:  python scripts/bench/rss_fresh.py [runs]
 """
 import json
 import os
@@ -15,7 +15,7 @@ import statistics
 import subprocess
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 EXE = os.environ.get("CARGO_TARGET_DIR", os.path.join(ROOT, "runtime", "target")) + r"\release\examples\rssone.exe"
 
 # name -> golden dir, in increasing input length.
@@ -27,7 +27,7 @@ RUNS = int(sys.argv[1]) if len(sys.argv) > 1 else 5
 def ids_for(gdir):
     path = os.path.join(ROOT, gdir, "manifest.json")
     if not os.path.exists(path):
-        sys.exit(f"{path} missing. Run: python scripts/dump_golden.py paradee_int8.onnx {gdir}")
+        sys.exit(f"{path} missing. Run: python scripts/verify/dump_golden.py paradee_int8.onnx {gdir}")
     return json.load(open(path))["input_ids"]
 
 

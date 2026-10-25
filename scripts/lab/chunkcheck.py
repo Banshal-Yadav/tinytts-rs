@@ -5,7 +5,7 @@ Runs the runtime twice on the same ids (unchunked and --chunk N), then:
     region vs the global distribution (a click shows up as an outlier),
   * reports the correlation between the two waveforms where they overlap.
 
-Usage:  python scripts/chunkcheck.py [max_tokens]
+Usage:  python scripts/lab/chunkcheck.py [max_tokens]
 """
 import json
 import os
@@ -15,8 +15,8 @@ import wave
 
 import numpy as np
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "scripts"))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import _ids
 EXE = os.environ.get("CARGO_TARGET_DIR", os.path.join(ROOT, "runtime", "target")) + r"\release\tinytts.exe"
 MODEL = os.path.join(ROOT, "paradee_int8.onnx")

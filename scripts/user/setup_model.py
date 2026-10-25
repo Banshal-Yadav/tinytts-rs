@@ -13,7 +13,7 @@ from paradee import Paradee
 
 HUB = os.path.expanduser(r"~\.cache\huggingface\hub")
 MODEL_GLOB = os.path.join(HUB, "blobs", "de", "*")
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 LONG_TEXT = os.path.join(ROOT, "text", "long_text.txt")
 
 

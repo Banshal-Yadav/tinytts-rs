@@ -1,9 +1,9 @@
 """Run the differential gate on all three input lengths.
 
-Usage:  python scripts/gate.py            # all three
-        python scripts/gate.py short      # one
+Usage:  python scripts/verify/gate.py            # all three
+        python scripts/verify/gate.py short      # one
 
-Requires golden_short/, golden/, golden_long/ (see scripts/dump_golden.py).
+Requires golden_short/, golden/, golden_long/ (see scripts/verify/dump_golden.py).
 Exit code 0 only if every length passes corr >= 0.99999.
 """
 import os
@@ -11,7 +11,7 @@ import re
 import subprocess
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 RUNTIME = os.path.join(ROOT, "runtime")
 
 # name -> (golden dir, min correlation)

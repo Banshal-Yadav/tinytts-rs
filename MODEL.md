@@ -68,6 +68,6 @@ Apache-2.0 model and are covered by the same license.
 ## What is not included
 
 - Model weights (`*.onnx`) — gitignored, download from the link above
-- Golden tensors (`golden*/`) — ~3.4 GB, regenerate with `scripts/dump_golden.py`
+- Golden tensors (`golden*/`) — ~3.4 GB, regenerate with `scripts/verify/dump_golden.py`
 - The Python baseline environment (`.venv/`) — see the model card for the
   upstream package

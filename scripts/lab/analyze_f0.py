@@ -10,7 +10,7 @@ import os
 import numpy as np
 import soundfile as sf
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 EVAL = os.path.join(ROOT, "samples", "eval")
 
 FRAME = 1024

@@ -14,7 +14,7 @@ Two problems with the naive comparison, both fixed here:
    timings from examples/wallacct.rs instead, which time only ops with <= 100
    nodes.
 
-Usage:  python scripts/deficit_table.py [short|mid|long]
+Usage:  python scripts/lab/deficit_table.py [short|mid|long]
 """
 import collections
 import json
@@ -23,8 +23,8 @@ import re
 import subprocess
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "scripts"))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import _ids
 MODEL = os.path.join(ROOT, "paradee_int8.onnx")
 IDS = _ids.all_ids()
@@ -38,7 +38,7 @@ ORT_WALL = {"short": 34.5, "mid": 96.7, "long": 868.9}[which]
 # ---- ORT ------------------------------------------------------------------
 ort_json = os.path.join(ROOT, "docs", f"ort_profile_{which}.json")
 if not os.path.exists(ort_json):
-    print(f"missing {ort_json}; run scripts/ort_profile.py {which} first")
+    print(f"missing {ort_json}; run scripts/verify/ort_profile.py {which} first")
     sys.exit(1)
 ort_raw = json.load(open(ort_json))
 ort_total = ort_raw.pop("__total__")["ms"]

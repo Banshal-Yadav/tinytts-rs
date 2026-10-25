@@ -3,7 +3,7 @@
 MAC counts come from the runtime's own `--shapes` dump (every node's real input
 and output shapes at the chosen input length), not from a hand-written table.
 
-Usage:  python scripts/gflops.py [--input mid]
+Usage:  python scripts/bench/gflops.py [--input mid]
 """
 import argparse
 import json
@@ -12,8 +12,8 @@ import sys
 import re
 import subprocess
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "scripts"))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import _ids
 MODEL = os.path.join(ROOT, "paradee_int8.onnx")
 RT = os.path.join(ROOT, "runtime")

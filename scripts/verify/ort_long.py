@@ -1,6 +1,6 @@
 """ORT on the 512-token input, 1 and 4 threads: time and peak RSS.
 
-Usage:  python scripts/ort_long.py
+Usage:  python scripts/verify/ort_long.py
 """
 import ctypes
 import ctypes.wintypes as wt
@@ -13,8 +13,8 @@ import time
 import numpy as np
 import onnxruntime as ort
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "scripts"))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import _ids
 MODEL = os.path.join(ROOT, "paradee_int8.onnx")
 IDS = _ids.all_ids()

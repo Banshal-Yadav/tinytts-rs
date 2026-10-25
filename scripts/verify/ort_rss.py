@@ -4,7 +4,7 @@ Reads the child process's peak working set via GetProcessMemoryInfo on a handle
 opened with PROCESS_QUERY_INFORMATION, which is what the earlier attempt got
 wrong (it queried the Python process, not the ORT worker).
 
-Usage:  python scripts/ort_rss.py
+Usage:  python scripts/verify/ort_rss.py
 """
 import ctypes
 import ctypes.wintypes as wt
@@ -16,8 +16,8 @@ import sys
 import textwrap
 import time
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "scripts"))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import _ids
 MODEL = os.path.join(ROOT, "paradee_int8.onnx")
 IDS = _ids.all_ids()

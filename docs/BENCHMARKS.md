@@ -21,7 +21,7 @@ alternately in one session and reports only the ratio.
 ## Head to head
 
 52-token input, 3.425 s of audio at 24 kHz, single thread unless stated.
-`scripts/benchmark.py`, 5 runs.
+`scripts/verify/benchmark.py`, 5 runs.
 
 | | ONNX Runtime 1T | ONNX Runtime 4T | this runtime |
 |---|---:|---:|---:|
@@ -42,7 +42,7 @@ usable when scaled to the real wall.
 ## Memory
 
 Fresh process per measurement, one load and one run each.
-`scripts/rss_fresh.py`, median of 5.
+`scripts/bench/rss_fresh.py`, median of 5.
 
 | input | tokens | audio | loaded RSS | peak LIVE | peak RSS | synth p50 |
 |---|---:|---:|---:|---:|---:|---:|
@@ -62,7 +62,7 @@ An early version of these numbers was wrong by 187 MB for exactly this reason.
 
 ## Chunked synthesis
 
-512-token input. `scripts/chunkdefaults.py`.
+512-token input. `scripts/lab/chunkdefaults.py`.
 
 | mode | chunks | peak RSS | synth | time to first audio | audio |
 |---|---:|---:|---:|---:|---:|
@@ -146,25 +146,25 @@ harmonic sum in 8.8 ms.
 
 ```bash
 # head to head (needs the Python baseline venv)
-python scripts/benchmark.py
+python scripts/verify/benchmark.py
 
 # fresh-process memory, 5 runs each
-python scripts/rss_fresh.py 5
+python scripts/bench/rss_fresh.py 5
 
 # p50/p95 over 20 runs after 3 warmups
-python scripts/bench_stats.py
+python scripts/bench/bench_stats.py
 
 # interleaved A/B between two commits, ratio only
-python scripts/ab_bench.py --a-commit <old> --b-commit <new> --rounds 20
+python scripts/bench/ab_bench.py --a-commit <old> --b-commit <new> --rounds 20
 
 # roofline calibration
 cd runtime && cargo run --release --example roofline
 
 # per-op GFLOP/s against the measured peak
-python scripts/gflops.py --input mid
+python scripts/bench/gflops.py --input mid
 
 # ORT per-op profile
-python scripts/ort_profile.py
+python scripts/verify/ort_profile.py
 ```
 
 Close background applications before benchmarking. The A/B harness prints the

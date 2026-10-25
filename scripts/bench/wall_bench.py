@@ -8,8 +8,8 @@ Wall time is the runtime's own `wall (load+synth)` line, which is measured
 inside the process with `Instant`. Per-node profile timing is NOT used.
 
 Usage:
-    python scripts/wall_bench.py --commits f92967f a6d76b5 HEAD --rounds 20
-    python scripts/wall_bench.py --exes a.exe b.exe --rounds 20
+    python scripts/bench/wall_bench.py --commits f92967f a6d76b5 HEAD --rounds 20
+    python scripts/bench/wall_bench.py --exes a.exe b.exe --rounds 20
 """
 import argparse
 import json
@@ -19,8 +19,8 @@ import statistics
 import subprocess
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "scripts"))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import _ids
 MODEL = os.path.join(ROOT, "paradee_int8.onnx")
 IDS = _ids.all_ids()

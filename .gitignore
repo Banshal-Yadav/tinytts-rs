@@ -7,7 +7,7 @@ runtime/target/
 
 # Golden tensors for the differential test (~3.4 GB for three lengths).
 # Regenerate with:
-#   python scripts/dump_golden.py paradee_int8.onnx golden
+#   python scripts/verify/dump_golden.py paradee_int8.onnx golden
 # before running `cargo test`.
 golden/
 golden_short/
@@ -39,6 +39,7 @@ Thumbs.db
 
 # Scratch outputs
 samples/_*.wav
+samples/*.mp3
 scripts/*.exe
 scripts/*.pdb
 scripts/liveness.json

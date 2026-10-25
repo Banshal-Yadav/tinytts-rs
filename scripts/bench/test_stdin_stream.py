@@ -15,7 +15,7 @@ TEXT = (
 
 CMD = [
     sys.executable,
-    "scripts/stream_play.py",
+    "scripts/user/stream_play.py",
     "--stdin-stream",
     "--no-play",
 ]

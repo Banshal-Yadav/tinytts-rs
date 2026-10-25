@@ -301,7 +301,7 @@ impl Exec {
     }
 
     /// Run the graph and print one line per node: `op<TAB>name<TAB>in_shapes<TAB>out_shapes`.
-    /// Used by `scripts/gflops.py` to compute exact MAC counts.
+    /// Used by `scripts/bench/gflops.py` to compute exact MAC counts.
     pub fn run_dump_shapes(&mut self, m: &Model, feeds: Vec<(String, T)>) {
         self.vals.clear();
         for (n, t) in &m.g.inits {

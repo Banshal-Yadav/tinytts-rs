@@ -85,7 +85,7 @@ fn main() {
     }
 
     // `--shapes`: dump every node's input/output shapes and exit. Used by
-    // scripts/gflops.py to compute exact MAC counts.
+    // scripts/bench/gflops.py to compute exact MAC counts.
     if shapes {
         let n = ids.len();
         e.run_dump_shapes(

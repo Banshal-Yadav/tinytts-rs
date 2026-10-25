@@ -401,7 +401,7 @@ fn coverage() {
 fn teacher_forced() {
     if !Path::new(&golden_dir()).exists() {
         eprintln!(
-            "SKIP: {}/ missing. Run scripts/dump_golden.py first.",
+            "SKIP: {}/ missing. Run scripts/verify/dump_golden.py first.",
             golden_dir()
         );
         return;
@@ -832,7 +832,7 @@ fn folded_basis_nodes() -> usize {
 fn full_graph_first_divergence() {
     if !Path::new(&golden_dir()).exists() {
         eprintln!(
-            "SKIP: {}/ missing. Run scripts/dump_golden.py first.",
+            "SKIP: {}/ missing. Run scripts/verify/dump_golden.py first.",
             golden_dir()
         );
         return;

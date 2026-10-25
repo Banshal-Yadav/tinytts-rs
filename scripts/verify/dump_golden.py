@@ -16,7 +16,7 @@ loads straight from the model.
 The Rust differential test (runtime/tests/diff_nodes.rs) consumes only these
 files, so it runs without Python or onnxruntime.
 
-Usage:  python scripts/dump_golden.py [model.onnx] [out_dir]
+Usage:  python scripts/verify/dump_golden.py [model.onnx] [out_dir]
 """
 import json
 import os

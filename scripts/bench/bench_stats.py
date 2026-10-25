@@ -1,6 +1,6 @@
 """p50/p95 over >= 20 runs after 3 warmups, for short/mid/long.
 
-Usage:  python scripts/bench_stats.py [runs]
+Usage:  python scripts/bench/bench_stats.py [runs]
 """
 import ctypes
 import ctypes.wintypes as wt
@@ -11,8 +11,8 @@ import subprocess
 import sys
 import time
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "scripts"))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import _ids
 EXE = os.environ.get("CARGO_TARGET_DIR", os.path.join(ROOT, "runtime", "target")) + r"\release\tinytts.exe"
 MODEL = os.path.join(ROOT, "paradee_int8.onnx")

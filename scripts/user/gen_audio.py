@@ -5,9 +5,9 @@ Writes to audio_out/ (gitignored). Each file is named
 and a sidecar .txt records the text, timing and RSS.
 
 Usage:
-    python scripts/gen_audio.py                 # 5 long + 5 medium
-    python scripts/gen_audio.py --long 3 --mid 2
-    python scripts/gen_audio.py --text "custom sentence"
+    python scripts/user/gen_audio.py                 # 5 long + 5 medium
+    python scripts/user/gen_audio.py --long 3 --mid 2
+    python scripts/user/gen_audio.py --text "custom sentence"
 """
 import argparse
 import ctypes
@@ -18,7 +18,7 @@ import os
 import subprocess
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 EXE = os.environ.get("CARGO_TARGET_DIR", os.path.join(ROOT, "runtime", "target")) \
     + r"\release\tinytts.exe"
 MODEL = os.path.join(ROOT, "paradee_int8.onnx")

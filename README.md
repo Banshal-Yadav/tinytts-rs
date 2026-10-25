@@ -49,7 +49,7 @@ A 512-token paragraph from `text/long_text.txt`, default chunking.
 Both on one core of an AMD Ryzen 7 7735HS laptop chip, single thread, after
 an **8 ms** load. Full machine specs and methodology below.
 
-Regenerate with `python scripts/gen_audio.py`.
+Regenerate with `python scripts/user/gen_audio.py`.
 
 ## Input is phoneme ids, not text
 
@@ -70,7 +70,7 @@ tts = Paradee(version="1.1", quantized=True, model_path="paradee_int8.onnx")
 ids = [0] + [tts.vocab[c] for c in tts.phonemize("Hello there.")] + [0]
 ```
 
-`scripts/gen_audio.py` shows the same thing end to end. Feeding raw characters
+`scripts/user/gen_audio.py` shows the same thing end to end. Feeding raw characters
 or eSpeak phonemes produces wrong audio, not an error.
 
 ## Measured performance
@@ -95,12 +95,12 @@ absolute floor.)
 Load is **77x faster** and peak memory is **2.9x smaller**. Synthesis is
 **4.0x slower** than ORT on one thread.
 
-Methodology: `scripts/benchmark.py` for the head-to-head, `scripts/rss_fresh.py`
+Methodology: `scripts/verify/benchmark.py` for the head-to-head, `scripts/bench/rss_fresh.py`
 for memory (one fresh process per measurement, so the RSS high-water mark is not
-contaminated by an earlier run), `scripts/bench_stats.py` for p50/p95 over 20
+contaminated by an earlier run), `scripts/bench/bench_stats.py` for p50/p95 over 20
 runs after 3 warmups. Absolute milliseconds on this laptop drift by 20%+ between
 sessions, so speed comparisons use an interleaved A/B benchmark
-(`scripts/ab_bench.py`) that runs both binaries alternately in one session and
+(`scripts/bench/ab_bench.py`) that runs both binaries alternately in one session and
 reports only the ratio.
 
 ### Memory across input lengths
@@ -249,10 +249,10 @@ tensors are not committed (they are ~3.4 GB for three input lengths); regenerate
 them once, then the test runs with no Python and no onnxruntime:
 
 ```bash
-python scripts/dump_golden.py paradee_int8.onnx golden          # 52-token
-IDS="..." python scripts/dump_golden.py paradee_int8.onnx golden_short
-IDS="..." python scripts/dump_golden.py paradee_int8.onnx golden_long
-python scripts/gate.py                                          # all three
+python scripts/verify/dump_golden.py paradee_int8.onnx golden          # 52-token
+IDS="..." python scripts/verify/dump_golden.py paradee_int8.onnx golden_short
+IDS="..." python scripts/verify/dump_golden.py paradee_int8.onnx golden_long
+python scripts/verify/gate.py                                          # all three
 ```
 
 ```bash

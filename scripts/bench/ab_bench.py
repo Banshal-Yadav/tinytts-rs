@@ -5,8 +5,8 @@ so a before/after comparison across sessions is meaningless. This runs both
 binaries in the SAME session, alternating, and reports only the RATIO.
 
 Usage:
-    python scripts/ab_bench.py --a <exeA> --b <exeB> [--rounds 20] [--input mid]
-    python scripts/ab_bench.py --a-commit f92967f --b-commit HEAD [--rounds 20]
+    python scripts/bench/ab_bench.py --a <exeA> --b <exeB> [--rounds 20] [--input mid]
+    python scripts/bench/ab_bench.py --a-commit f92967f --b-commit HEAD [--rounds 20]
 
 --a-commit/--b-commit build each commit into its own CARGO_TARGET_DIR via
 `git worktree`, so the two binaries are built from source and never overwrite
@@ -24,8 +24,8 @@ import subprocess
 import sys
 import time
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "scripts"))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import _ids
 MODEL = os.path.join(ROOT, "paradee_int8.onnx")
 IDS = _ids.all_ids()

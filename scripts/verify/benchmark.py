@@ -7,9 +7,9 @@ Measures, for the same 52-token phoneme input:
   * real-time factor (audio seconds produced per wall second)
 
 Usage:
-    python scripts/benchmark.py            # both
-    python scripts/benchmark.py python     # baseline only
-    python scripts/benchmark.py rust       # ours only
+    python scripts/verify/benchmark.py            # both
+    python scripts/verify/benchmark.py python     # baseline only
+    python scripts/verify/benchmark.py rust       # ours only
 """
 import ctypes
 import ctypes.wintypes as wt
@@ -20,7 +20,7 @@ import subprocess
 import sys
 import time
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 MODEL = os.path.join(ROOT, "paradee_int8.onnx")
 RUST_EXE = os.path.join(ROOT, "runtime", "target", "release", "tinytts.exe")
 SAMPLE_RATE = 24000
