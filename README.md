@@ -16,7 +16,7 @@ It is a **single-model runtime**, not a general ONNX engine. It implements the
 56 op types this graph uses, with the shapes and dtypes this graph uses. It will
 reject anything else rather than silently produce wrong numbers.
 
-ONNX Runtime synthesizes 3-4x faster; this runtime loads in 12 ms instead of 610,
+ONNX Runtime synthesizes about 3x faster; this runtime loads in 12 ms instead of 610,
 runs in 46 MB instead of 226, and needs nothing but a Rust compiler.
 
 ## Two files. That's the whole system.
@@ -27,10 +27,10 @@ runs in 46 MB instead of 226, and needs nothing but a Rust compiler.
 | `paradee_int8.onnx` | **8.1 MB** | the model, downloaded from Hugging Face |
 
 **8.6 MB total** - smaller than one MP3. No Python, no ONNX Runtime, no DLLs,
-no config. Copy both files to any x86-64 machine and it speaks.
+no config. Copy both files to any x86-64 machine and it synthesizes from phoneme ids.
 
 No Rust? Grab the prebuilt Windows binary from
-[Releases](https://github.com/Banshal-Yadav/tinytts-rs/releases) (267 KB zip).
+[Releases](https://github.com/Banshal-Yadav/tinytts-rs/releases) (272 KB zip).
 
 ## Hear it
 
@@ -89,6 +89,10 @@ unless stated. 52-token input, 3.425 s of audio at 24 kHz.
 
 Both runtimes were measured in the same session with the same script
 (`scripts/verify/benchmark.py`), one fresh process per run, median of 5.
+benchmark.py reads the peak from the CLI binary's own stderr; the lengths
+table below uses `scripts/bench/rss_fresh.py`, which runs a dedicated
+example binary and reports a slightly lower peak (42.6 MB for the same
+input) because it excludes the CLI's WAV writer and stderr reporting.
 
 Load is **50x faster** and peak memory is **4.9x smaller**. Synthesis is
 **2.9x slower** than ORT on one thread.
@@ -132,7 +136,7 @@ is why it is opt-in above 100 tokens rather than always on.
 
 The first working version of this runtime, before any optimization, ran the same
 52-token input in **6617 ms** with a **417 MB** peak RSS. It is now 270 ms and
-46 MB: **24.5x faster** and **9.1x smaller**. The wins, in order of size:
+46 MB: **about 20x faster** and **9x smaller**. The wins, in order of size:
 
 | change | effect |
 |---|---|
@@ -218,8 +222,9 @@ Plus four fused ops the graph rewriter creates: `Dequant`, `ElemChain`,
 ## Limitations
 
 - **x86-64 only for SIMD.** The AVX2+FMA paths are compiled only on x86-64 and
-  detected at run time. There is no NEON path yet: ARM builds compile and run
-  on the scalar fallback, and are much slower.
+  detected at run time. There is no NEON path yet: the runtime builds on
+  aarch64 (verified with `cargo check`) but has not been run or benchmarked on
+  ARM hardware, and would use the scalar fallback.
 - **One model.** The op set, the fusion patterns and the FFT replacement are all
   specific to this graph. It is not a general ONNX runtime.
 - **Phoneme ids in, not text.** No tokenizer or grapheme-to-phoneme front end.
@@ -237,7 +242,7 @@ Plus four fused ops the graph rewriter creates: `Dequant`, `ElemChain`,
 - **542 KB** static binary, zero dependencies, no DLLs
 - **8.6 MB** total: binary + model, smaller than one MP3
 - **9-14x realtime** on a single laptop core, faster than you can listen
-- **24.5x faster** and **9.1x smaller** than the naive first version
+- **about 20x faster** and **9x smaller** than the naive first version
 - Chunked streaming: first audio in **370 ms** on a 30 s paragraph
 
 ## Tests
