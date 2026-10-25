@@ -46,7 +46,8 @@ https://github.com/user-attachments/assets/689864b8-f097-4b67-ba15-5f1d53a76d49
 A 512-token paragraph from `text/long_text.txt`, default chunking.
 32.1 s of audio, synthesized in **2.2 s** (14.6x realtime).
 
-Both on one laptop core, single thread, after an **8 ms** load.
+Both on one core of an AMD Ryzen 7 7735HS laptop chip, single thread, after
+an **8 ms** load. Full machine specs and methodology below.
 
 Regenerate with `python scripts/gen_audio.py`.
 
