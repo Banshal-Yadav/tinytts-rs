@@ -16,6 +16,7 @@
 //! Known limitation (documented, by design): no POS tagging, so heteronyms
 //! ("lead", "read", "bass") always get their DEFAULT (noun) pronunciation.
 
+pub mod arpabet;
 pub mod lexicon;
 pub mod rules;
 

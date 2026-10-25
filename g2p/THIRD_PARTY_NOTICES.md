@@ -27,6 +27,10 @@ This crate embeds lexical data from the following sources. The runtime crate
 
 - File: `cmudict.dict` (embedded here in compiled form as `src/lexicon.bin`)
 - Source: <https://github.com/cmusphinx/cmudict> (`cmudict.dict`)
+- Local copy: `g2p/cmudict.dict` (gitignored, 3.4 MB). Fetch it with:
+  `https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict`
+  sha256 of the copy used for the current blob:
+  `81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22`
 - License (BSD-style, Carnegie Mellon University):
 
 ```
@@ -68,8 +72,9 @@ Before building the crate, generate it with:
 python g2p/gen_lexicon.py g2p/src/lexicon.bin
 ```
 
-which reads the two misaki JSON files from the Python environment and
-`cmudict.dict` from the spike folder. Any regeneration must re-check the
+which reads the two misaki JSON files from the Python environment (the repo's
+`.venv`, misaki 0.9.4) and `cmudict.dict` from `g2p/cmudict.dict` (gitignored;
+fetch URL and sha256 above). Any regeneration must re-check the
 upstream sources for license changes before the new blob is used. The
 committed state records the exact generator and its inputs; the blob itself
 is a build artifact.

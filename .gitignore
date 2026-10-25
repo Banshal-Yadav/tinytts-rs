@@ -58,3 +58,8 @@ AGENTS.md
 # tinytts-g2p embedded lexicon (12.8 MB, generated). Regenerate with:
 #   python g2p/gen_lexicon.py g2p/src/lexicon.bin
 g2p/src/lexicon.bin
+
+# CMUdict source for the lexicon generator (3.4 MB, re-downloadable).
+# Fetch: https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict
+# (see g2p/THIRD_PARTY_NOTICES.md for the license and regeneration steps)
+g2p/cmudict.dict
