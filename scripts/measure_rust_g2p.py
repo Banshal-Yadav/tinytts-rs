@@ -1,12 +1,14 @@
 """Measure the Rust g2p CLI against the frozen held-out set.
 
-Builds the release CLI, runs every heldout sentence through it, and reports
-the same metrics as scripts/baseline_heldout.py (exact %, word match %, PER,
-OOV). This is the Day-2 lexicon-only number; it is expected to be low until
-the CMU mapping and context rules land on Day 3.
+Reports the same metrics as scripts/baseline_heldout.py (exact %, word
+match %, PER, OOV), plus a digit-free-subset breakdown: sentences without
+any digit are fully covered by the ported pipeline, so their numbers are
+the honest ported-quality signal until number expansion lands.
 """
+import difflib
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -15,6 +17,7 @@ REPO = r"C:\Users\bansa\OneDrive\Desktop\TTS-8M-model"
 EXE = r"C:\tts-target\release\g2p.exe"
 
 refs = json.load(open(os.path.join(REPO, "heldout_ref.json"), encoding="utf-8"))
+num_pat = re.compile(r"\d")
 
 
 def lev(a, b):
@@ -29,57 +32,66 @@ def lev(a, b):
     return prev[lb]
 
 
-exact = 0
-total_ref = 0
-total_err = 0
-word_total = 0
-word_match = 0
-oov_count = 0
-mismatches = {}
+def score(subset, label):
+    exact = 0
+    total_ref = 0
+    total_err = 0
+    word_total = 0
+    word_match = 0
+    oov_count = 0
+    mismatches = {}
+    strip = ".,!?;:\"\u201c\u201d\u2018\u2019\u2026\u2014"
+    for r in subset:
+        try:
+            p = subprocess.run([EXE, r["text"]], capture_output=True, timeout=30)
+        except subprocess.TimeoutExpired:
+            print(f"FATAL: rust HANG on: {r['text']!r}")
+            sys.exit(2)
+        got = p.stdout.decode("utf-8").rstrip("\n")
+        oov_line = p.stderr.decode("utf-8").strip()
+        oov = 1 if oov_line.startswith("warning: OOV") else 0
+        oov_count += oov
+        ref = r["phonemes"]
+        if not oov and got == ref:
+            exact += 1
+            continue
+        total_ref += len(ref)
+        total_err += len(ref) if oov else lev(got, ref)
+        if not oov:
+            gw = [w.strip(strip) for w in got.split()]
+            rw = [w.strip(strip) for w in ref.split()]
+            sm = difflib.SequenceMatcher(a=gw, b=rw, autojunk=False)
+            for tag, i1, i2, j1, j2 in sm.get_opcodes():
+                if tag == "equal":
+                    word_total += j2 - j1
+                    word_match += j2 - j1
+                elif tag == "replace":
+                    word_total += max(j2 - j1, i2 - i1)
+                    for k in range(min(j2 - j1, i2 - i1)):
+                        key = (rw[j1 + k], gw[i1 + k])
+                        mismatches[key] = mismatches.get(key, 0) + 1
+                elif tag == "delete":
+                    word_total += i2 - i1
+                elif tag == "insert":
+                    word_total += j2 - j1
+    n = len(subset)
+    print(f"--- {label}: {n} sentences ---")
+    print(f"exact sentence match: {exact}/{n} = {100 * exact / n:.1f}%")
+    print(f"word-level phoneme match: {word_match}/{word_total} = "
+          f"{100 * word_match / max(1, word_total):.2f}%")
+    print(f"PER (all, OOV = full error): {100 * total_err / max(1, total_ref):.2f}%")
+    print(f"sentences with OOV: {oov_count}")
+    return mismatches
+
 
 t0 = time.perf_counter()
-for r in refs:
-    p = subprocess.run([EXE, r["text"]], capture_output=True, text=True,
-                       encoding="utf-8")
-    got = p.stdout.strip()
-    oov_line = p.stderr.strip()
-    oov = 1 if "warning: OOV" in oov_line else 0
-    oov_count += oov
-    ref = r["phonemes"]
-    if not oov and got == ref:
-        exact += 1
-        continue
-    total_ref += len(ref)
-    total_err += len(ref) if oov else lev(got, ref)
-    if not oov:
-        strip = ".,!?;:\"\u201c\u201d\u2018\u2019\u2026\u2014"
-        gw = [w.strip(strip) for w in got.split()]
-        rw = [w.strip(strip) for w in ref.split()]
-        import difflib
-        sm = difflib.SequenceMatcher(a=gw, b=rw, autojunk=False)
-        for tag, i1, i2, j1, j2 in sm.get_opcodes():
-            if tag == "equal":
-                word_total += j2 - j1
-                word_match += j2 - j1
-            elif tag == "replace":
-                word_total += max(j2 - j1, i2 - i1)
-                for k in range(min(j2 - j1, i2 - i1)):
-                    key = (rw[j1 + k], gw[i1 + k])
-                    mismatches[key] = mismatches.get(key, 0) + 1
-            elif tag == "delete":
-                word_total += i2 - i1
-            elif tag == "insert":
-                word_total += j2 - j1
+all_mismatches = score(refs, "ALL sentences")
 dt = time.perf_counter() - t0
 
-n = len(refs)
-print(f"sentences: {n}")
-print(f"exact sentence match: {exact}/{n} = {100 * exact / n:.1f}%")
-print(f"word-level phoneme match: {word_match}/{word_total} = "
-      f"{100 * word_match / max(1, word_total):.2f}%")
-print(f"PER (all, OOV = full error): {100 * total_err / max(1, total_ref):.2f}%")
-print(f"sentences with OOV: {oov_count}")
-print(f"wall time: {dt * 1000 / n:.2f} ms/sentence (subprocess overhead included)")
-print("top word mismatches (ref <- got):")
-for (rr, g), c in sorted(mismatches.items(), key=lambda kv: -kv[1])[:15]:
+digit_free = [r for r in refs if not num_pat.search(r["text"])]
+df_mismatches = score(digit_free, "digit-free subset (fully covered by the port)")
+
+print(f"wall time: {dt * 1000 / len(refs):.2f} ms/sentence (subprocess overhead included)")
+print("top word mismatches, digit-free subset (ref <- got):")
+for (rr, g), c in sorted(df_mismatches.items(), key=lambda kv: -kv[1])[:15]:
     print(f"  {c:3d}  {rr!r} <- {g!r}")

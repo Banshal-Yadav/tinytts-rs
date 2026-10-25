@@ -1,10 +1,10 @@
 //! CMUdict ARPAbet to misaki symbol mapping, ported from the validated
 //! Python prototype (g2p-spike/proto3.py, `MAP` / `UNSTRESSED` / `cmu_convert`).
 //!
-//! The map was statistically derived against misaki's own lexicon during the
-//! spike (see g2p-spike/derive_map.py); it is frozen here so the Rust port
-//! matches the Python reference byte for byte. Differential tests in
-//! `tests/diff.rs` enforce that.
+//! The map was statistically derived against misaki's own lexicon
+//! (see g2p-spike/derive_map.py); it is frozen here so the Rust port
+//! matches the Python reference byte for byte. The differential test
+//! (scripts/diff_g2p.py) enforces that.
 
 /// ARPAbet base phone -> misaki symbol (stressed or fully-reduced forms are
 /// handled separately in `convert`).

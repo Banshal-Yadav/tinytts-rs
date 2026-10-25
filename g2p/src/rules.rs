@@ -1,12 +1,11 @@
-//! Day-3 word pipeline: tokenization, misaki lookup, CMU ARPAbet fallback
-//! with -s/-ed/-ing stem rules, function-word context rules, and the
-//! misaki-style post passes (flap, flap_all, demote_later, cap_stress).
-//! Ported line-for-line from the validated Python prototype
-//! (g2p-spike/proto3.py); the differential test in `tests/diff.rs` enforces
-//! byte-exact agreement with that reference on the spike corpus.
+//! Word pipeline: tokenization, misaki lookup, CMU ARPAbet fallback with
+//! -s/-ed/-ing stem rules, function-word context rules, and the misaki-style
+//! post passes (flap, flap_all, demote_later, cap_stress). Ported from the
+//! validated Python prototype (g2p-spike/proto3.py); the differential test
+//! (scripts/diff_g2p.py) enforces byte-exact agreement with that reference.
 //!
-//! Day-4 scope (numbers, dates, currency) is intentionally NOT here yet:
-//! number tokens are reported as OOV-adjacent gaps, never silently dropped.
+//! Number tokens are reported as gaps, never silently dropped; number
+//! expansion is a separate, not-yet-ported layer.
 
 use crate::arpabet;
 use crate::lexicon;
@@ -90,7 +89,7 @@ fn tokenize(text: &str) -> Vec<Tok> {
 }
 
 // ---------------------------------------------------------------------------
-// CMU fallback with stem rules (proto3 cmu_lookup / add_s / add_ed / add_ing)
+// CMU fallback with stem rules (cmu_lookup / add_s / add_ed / add_ing)
 // ---------------------------------------------------------------------------
 
 /// Split "AO1" into ("AO", "1").
@@ -131,7 +130,7 @@ fn add_ing(stem: &str) -> Option<String> {
     Some(out)
 }
 
-/// CMUdict lookup with the proto3 stem rules. `word` must be lowercase.
+/// CMUdict lookup with the stem rules. `word` must be lowercase.
 fn cmu_lookup(word: &str) -> Option<String> {
     let mut phones = lexicon::lookup_cmu(word).map(|s| s.to_string());
     if phones.is_none() {
@@ -172,7 +171,7 @@ fn cmu_lookup(word: &str) -> Option<String> {
         if word.len() > 4 && word.ends_with("ing") {
             let stem1 = word[..word.len() - 3].to_string();
             let stem2 = format!("{}e", stem1);
-            // proto3 regex: ([bcdgklmnprstvxz])\1ing$ or cking$
+            // reference regex: ([bcdgklmnprstvxz])\1ing$ or cking$
             let b = word.as_bytes();
             let doubled = b.len() >= 5
                 && b[b.len() - 5] == b[b.len() - 4]
@@ -200,7 +199,7 @@ fn cmu_lookup(word: &str) -> Option<String> {
 }
 
 /// misaki gold+silver lookup (the pre-grown case variants make this a plain
-/// byte compare, exactly like proto3's GOLD.get(word) or GOLD.get(lower)).
+/// byte compare; the lowercase fallback mirrors the reference lookup).
 fn lexicon_lookup(word: &str) -> Option<&'static str> {
     lexicon::lookup_misaki(word).or_else(|| {
         let low = word.to_lowercase();
@@ -213,10 +212,10 @@ fn lexicon_lookup(word: &str) -> Option<&'static str> {
 }
 
 // ---------------------------------------------------------------------------
-// Function-word context rules (proto3 g2p, word-level branch)
+// Function-word context rules (word-level branch)
 // ---------------------------------------------------------------------------
 
-/// Letter-by-letter spelling using misaki's gold letter names (proto3
+/// Letter-by-letter spelling using misaki's gold letter names (the
 /// LETTERS). Returns letters joined with spaces; the acronym path strips
 /// the spaces.
 fn spell_out(word: &str) -> Option<String> {
@@ -276,8 +275,8 @@ fn next_word_phonemes(idx: usize, toks: &[Tok]) -> Option<String> {
     None
 }
 
-/// Convert text to phonemes (Day-3 scope: words + punctuation; numbers are
-/// reported gaps until Day 4).
+/// Convert text to phonemes. Words and punctuation are fully handled;
+/// number tokens are reported as gaps until number expansion is ported.
 pub fn g2p(text: &str) -> G2pResult {
     let text = text.strip_prefix('\u{feff}').unwrap_or(text);
     let toks = tokenize(text);
@@ -295,16 +294,16 @@ pub fn g2p(text: &str) -> G2pResult {
                 }
             }
             Tok::Number(n) => {
-                // Day 4: number expansion. Until then the digits are a
-                // reported gap, not a silent one.
+                // number expansion is not ported yet; until then the digits
+                // are a reported gap, not a silent one.
                 oov.push(n.clone());
                 parts.push(n.clone());
             }
             Tok::Other(c) => match c {
-                // proto3 skips these outright (hyphen join, currency prefix
-                // handled with numbers on Day 4, stray apostrophes)
+                // skipped outright (hyphen join, currency prefix handled
+                // with numbers, stray apostrophes)
                 '\'' | '-' | '$' => {}
-                // symbol words (proto3 SYMBOLS/ADD_SYMBOLS)
+                // symbol words (reference SYMBOLS/ADD_SYMBOLS)
                 '@' => parts.push("ˈæt".to_string()),
                 '+' => parts.push("plˈʌs".to_string()),
                 '/' => parts.push("slˈæʃ".to_string()),
@@ -312,7 +311,7 @@ pub fn g2p(text: &str) -> G2pResult {
             },
             Tok::Word(w) => {
                 let low = w.to_lowercase();
-                // function-word context rules first (proto3 order)
+                // function-word context rules first (reference order)
                 if w == "a" || (w == "A" && !sent_start) {
                     parts.push("ɐ".to_string());
                     continue;
@@ -407,7 +406,7 @@ pub fn g2p(text: &str) -> G2pResult {
                 }
                 match ps {
                     None => {
-                        // proto3 drops OOV words from the output and reports
+                        // the reference drops OOV words from the output and reports
                         // them; the stderr warning keeps this non-silent.
                         oov.push(w.clone());
                     }
@@ -463,7 +462,7 @@ mod tests {
 
     #[test]
     fn oov_is_reported_not_silent() {
-        // proto3 semantics: OOV words are dropped from the phoneme string
+        // reference semantics: OOV words are dropped from the phoneme string
         // but reported in `oov` (and warned on stderr by the CLI).
         let r = g2p("The zxqj sat.");
         assert_eq!(r.oov, vec!["zxqj".to_string()]);
@@ -471,7 +470,7 @@ mod tests {
     }
 
     #[test]
-    fn numbers_are_reported_until_day_4() {
+    fn numbers_are_reported_as_gaps() {
         let r = g2p("I have 3 cats.");
         assert_eq!(r.oov, vec!["3".to_string()]);
     }
@@ -529,7 +528,7 @@ mod tests {
     #[test]
     fn capitalized_word_with_stress_unchanged() {
         // "Hello" already carries ˈ in misaki, so cap_stress must NOT fire
-        // (proto3: only words with no stress marks get ˌ inserted; the
+        // (only words with no stress marks get a secondary mark inserted; the
         // insertion itself is unit-tested in arpabet::tests).
         assert_eq!(g2p("Hello").phonemes, "həlˈO");
     }
