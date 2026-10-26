@@ -1,4 +1,5 @@
-"""Day 1 untuned baseline: spike's proto3.py (as-is, no tuning) on the frozen held-out set.
+"""Reference baseline: the repo's proto3.py (g2p/reference) on the frozen
+held-out set.
 
 Reports: exact sentence match %, word-level phoneme match %, PER (all and
 non-OOV), OOV count + word list.
@@ -6,10 +7,10 @@ non-OOV), OOV count + word list.
 import difflib, json, os, re, sys, time
 from collections import Counter
 
-sys.path.insert(0, r"C:\Users\bansa\OneDrive\Desktop\g2p-spike")
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(REPO, "g2p", "reference"))
 import proto3
 
-REPO = r"C:\Users\bansa\OneDrive\Desktop\TTS-8M-model"
 refs = json.load(open(os.path.join(REPO, "heldout_ref.json"), encoding="utf-8"))
 n = len(refs)
 

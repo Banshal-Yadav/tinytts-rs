@@ -59,7 +59,9 @@ AGENTS.md
 #   python g2p/gen_lexicon.py g2p/src/lexicon.bin
 g2p/src/lexicon.bin
 
-# CMUdict source for the lexicon generator (3.4 MB, re-downloadable).
-# Fetch: https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict
+# CMUdict source for the lexicon generator and the reference (3.4 MB,
+# re-downloadable). Fetch:
+# https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict
 # (see g2p/THIRD_PARTY_NOTICES.md for the license and regeneration steps)
 g2p/cmudict.dict
+g2p/reference/cmudict.dict

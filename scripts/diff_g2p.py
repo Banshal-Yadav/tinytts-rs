@@ -17,16 +17,16 @@ import subprocess
 import sys
 from collections import Counter
 
-REPO = r"C:\Users\bansa\OneDrive\Desktop\TTS-8M-model"
-SPIKE = r"C:\Users\bansa\OneDrive\Desktop\g2p-spike"
-EXE = r"C:\tts-target\release\g2p.exe"
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REFERENCE = os.path.join(REPO, "g2p", "reference")
+EXE = os.environ.get("G2P_EXE", r"C:\tts-target\release\g2p.exe")
 
-sys.path.insert(0, SPIKE)
-os.chdir(SPIKE)
+sys.path.insert(0, REFERENCE)
+os.chdir(REFERENCE)
 import proto3  # noqa: E402
 
 # --- inputs -----------------------------------------------------------------
-sentences = json.load(open(os.path.join(SPIKE, "sentences.json"), encoding="utf-8"))
+sentences = json.load(open(os.path.join(REFERENCE, "sentences.json"), encoding="utf-8"))
 inputs = [s["text"] for s in sentences]
 
 # edge cases: function words in every position, capitals, acronyms, CMU-only

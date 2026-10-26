@@ -1,0 +1,2602 @@
+[
+ {
+  "id": 0,
+  "source": "long_text",
+  "text": "﻿The history of speech synthesis is a long and surprisingly stubborn one."
+ },
+ {
+  "id": 1,
+  "source": "long_text",
+  "text": "For most of the twentieth century, the best a machine could do was imitate a human voice in the crudest possible way, buzzing through a bank of analog filters and hoping the listener would fill in the gaps."
+ },
+ {
+  "id": 2,
+  "source": "long_text",
+  "text": "The results were intelligible, barely, and they sounded like a robot trapped inside a pipe."
+ },
+ {
+  "id": 3,
+  "source": "long_text",
+  "text": "Then came concatenative synthesis, which stitched together thousands of tiny recorded fragments, and for a while that was good enough for telephone menus and talking clocks."
+ },
+ {
+  "id": 4,
+  "source": "long_text",
+  "text": "Neural networks changed the rules entirely."
+ },
+ {
+  "id": 5,
+  "source": "long_text",
+  "text": "Instead of assembling pieces of recorded speech, a network could learn the mapping from text to waveform directly, and by the early twenty twenties the best systems were nearly indistinguishable from a person reading aloud."
+ },
+ {
+  "id": 6,
+  "source": "long_text",
+  "text": "The catch was size."
+ },
+ {
+  "id": 7,
+  "source": "long_text",
+  "text": "A good neural voice often needed hundreds of millions of parameters, a GPU, and a small power station to run in real time."
+ },
+ {
+  "id": 8,
+  "source": "long_text",
+  "text": "Paradee takes the opposite bet."
+ },
+ {
+  "id": 9,
+  "source": "long_text",
+  "text": "It asks how small a voice can be before it stops being useful, and it answers with fewer than eight million parameters, a single eight megabyte file, and a decoder that never upsamples."
+ },
+ {
+  "id": 10,
+  "source": "long_text",
+  "text": "The result is a model that speaks faster than you can listen, on one thread of an ordinary laptop processor, with no graphics card and no network connection."
+ },
+ {
+  "id": 11,
+  "source": "long_text",
+  "text": "That is the whole point."
+ },
+ {
+  "id": 12,
+  "source": "long_text",
+  "text": "A voice that runs anywhere is a voice that can live inside a browser tab, a phone, a cheap embedded board, or a program you wrote on a rainy afternoon."
+ },
+ {
+  "id": 13,
+  "source": "long_text",
+  "text": "It will not win a contest against a giant model trained on a thousand hours of studio recordings, but it does not need to."
+ },
+ {
+  "id": 14,
+  "source": "long_text",
+  "text": "It needs to be small, fast, and clear, and on all three counts it delivers."
+ },
+ {
+  "id": 15,
+  "source": "prose",
+  "text": "The old lighthouse keeper climbed the spiral stairs every evening at dusk."
+ },
+ {
+  "id": 16,
+  "source": "prose",
+  "text": "She counted the steps out of habit, though she no longer needed to."
+ },
+ {
+  "id": 17,
+  "source": "prose",
+  "text": "Forty-two steps, then a landing, then thirty more to the lamp room."
+ },
+ {
+  "id": 18,
+  "source": "prose",
+  "text": "The storm had knocked out the power three days ago, and the backup generator was failing."
+ },
+ {
+  "id": 19,
+  "source": "prose",
+  "text": "Outside, waves hammered the rocks with a rhythm that never quite repeated."
+ },
+ {
+  "id": 20,
+  "source": "prose",
+  "text": "He asked her once why she stayed, and she said the light was a promise."
+ },
+ {
+  "id": 21,
+  "source": "prose",
+  "text": "On the mainland, people forgot the lighthouse existed until the night it went dark."
+ },
+ {
+  "id": 22,
+  "source": "prose",
+  "text": "A fishing boat ran aground on the northern shoal, and the crew of four survived."
+ },
+ {
+  "id": 23,
+  "source": "prose",
+  "text": "After that, the town council voted to fund a full-time keeper again."
+ },
+ {
+  "id": 24,
+  "source": "prose",
+  "text": "She took the job without hesitation, though her doctor advised against it."
+ },
+ {
+  "id": 25,
+  "source": "prose",
+  "text": "The salary was modest, but the view from the lamp room was worth more than money."
+ },
+ {
+  "id": 26,
+  "source": "prose",
+  "text": "Every night at sunset, she lit the lamp and swept the glass until it gleamed."
+ },
+ {
+  "id": 27,
+  "source": "prose",
+  "text": "Children from the village sometimes visited on weekends, asking endless questions."
+ },
+ {
+  "id": 28,
+  "source": "prose",
+  "text": "One boy wanted to know if she was ever afraid, and she laughed."
+ },
+ {
+  "id": 29,
+  "source": "prose",
+  "text": "Fear, she said, is just respect for something bigger than yourself."
+ },
+ {
+  "id": 30,
+  "source": "prose",
+  "text": "The sea taught her that lesson decades ago, and she never forgot it."
+ },
+ {
+  "id": 31,
+  "source": "prose",
+  "text": "Modern navigation systems had made lighthouses obsolete, everyone told her."
+ },
+ {
+  "id": 32,
+  "source": "prose",
+  "text": "Yet ships still passed close on foggy nights, watching for her beam."
+ },
+ {
+  "id": 33,
+  "source": "prose",
+  "text": "Technology fails, she replied, but a steady light never does."
+ },
+ {
+  "id": 34,
+  "source": "prose",
+  "text": "When she finally retired at seventy, the village threw her a party."
+ },
+ {
+  "id": 35,
+  "source": "prose",
+  "text": "The new keeper was a young man from the city who had never seen the ocean."
+ },
+ {
+  "id": 36,
+  "source": "prose",
+  "text": "She spent a week teaching him the routines, the maintenance, the patience."
+ },
+ {
+  "id": 37,
+  "source": "prose",
+  "text": "On her last night, she climbed the stairs one final time and lit the lamp."
+ },
+ {
+  "id": 38,
+  "source": "prose",
+  "text": "Then she sat in the doorway and watched the sun rise over the water."
+ },
+ {
+  "id": 39,
+  "source": "prose",
+  "text": "It was, she later wrote in her journal, a good ending to a good story."
+ },
+ {
+  "id": 40,
+  "source": "variety",
+  "text": "I have 3 cats and 12 fish in the aquarium."
+ },
+ {
+  "id": 41,
+  "source": "variety",
+  "text": "The meeting starts at 9:30 tomorrow morning."
+ },
+ {
+  "id": 42,
+  "source": "variety",
+  "text": "She paid $42.50 for the entire meal."
+ },
+ {
+  "id": 43,
+  "source": "variety",
+  "text": "In 1998 the population was about 45,000 people."
+ },
+ {
+  "id": 44,
+  "source": "variety",
+  "text": "The temperature dropped to -7 degrees overnight."
+ },
+ {
+  "id": 45,
+  "source": "variety",
+  "text": "Chapter 7 covers everything from 1960 to 1975."
+ },
+ {
+  "id": 46,
+  "source": "variety",
+  "text": "He ran 5 kilometers in exactly 23 minutes."
+ },
+ {
+  "id": 47,
+  "source": "variety",
+  "text": "The package weighs 2.5 kilograms and costs $18."
+ },
+ {
+  "id": 48,
+  "source": "variety",
+  "text": "By 2050, experts predict 9 billion people on Earth."
+ },
+ {
+  "id": 49,
+  "source": "variety",
+  "text": "Room 405 is on the 4th floor, near the elevator."
+ },
+ {
+  "id": 50,
+  "source": "variety",
+  "text": "The concert is on March 15th at 8 PM."
+ },
+ {
+  "id": 51,
+  "source": "variety",
+  "text": "World War II ended in 1945."
+ },
+ {
+  "id": 52,
+  "source": "variety",
+  "text": "Her birthday is December 24, and she'll be 30."
+ },
+ {
+  "id": 53,
+  "source": "variety",
+  "text": "The train leaves at 6:45 AM every weekday."
+ },
+ {
+  "id": 54,
+  "source": "variety",
+  "text": "They met on a Friday the 13th, oddly enough."
+ },
+ {
+  "id": 55,
+  "source": "variety",
+  "text": "The NASA launch was delayed by weather."
+ },
+ {
+  "id": 56,
+  "source": "variety",
+  "text": "Call Dr. Smith about the MRI results."
+ },
+ {
+  "id": 57,
+  "source": "variety",
+  "text": "The URL for the site is example.com."
+ },
+ {
+  "id": 58,
+  "source": "variety",
+  "text": "She works at MIT in the AI lab."
+ },
+ {
+  "id": 59,
+  "source": "variety",
+  "text": "The FBI and CIA share some data now."
+ },
+ {
+  "id": 60,
+  "source": "variety",
+  "text": "Send it to P.O. Box 123, please."
+ },
+ {
+  "id": 61,
+  "source": "variety",
+  "text": "The pH of the solution was 7.2."
+ },
+ {
+  "id": 62,
+  "source": "variety",
+  "text": "He earned a Ph.D. in chemistry from UCLA."
+ },
+ {
+  "id": 63,
+  "source": "variety",
+  "text": "The CPU hit 90 degrees Celsius under load."
+ },
+ {
+  "id": 64,
+  "source": "variety",
+  "text": "Use HTTPS for all API requests."
+ },
+ {
+  "id": 65,
+  "source": "variety",
+  "text": "The lead singer will lead the band tonight."
+ },
+ {
+  "id": 66,
+  "source": "variety",
+  "text": "I read that book last year, and I still read it monthly."
+ },
+ {
+  "id": 67,
+  "source": "variety",
+  "text": "Please wind the clock before the wind picks up."
+ },
+ {
+  "id": 68,
+  "source": "variety",
+  "text": "They will present the present to the winner."
+ },
+ {
+  "id": 69,
+  "source": "variety",
+  "text": "The dove dove into the water gracefully."
+ },
+ {
+  "id": 70,
+  "source": "variety",
+  "text": "The bass player caught a large bass yesterday."
+ },
+ {
+  "id": 71,
+  "source": "variety",
+  "text": "Tear the paper carefully; there's a tear in my sleeve."
+ },
+ {
+  "id": 72,
+  "source": "variety",
+  "text": "The farm was used to produce produce."
+ },
+ {
+  "id": 73,
+  "source": "variety",
+  "text": "The dump was so full it had to refuse more refuse."
+ },
+ {
+  "id": 74,
+  "source": "variety",
+  "text": "He could lead if he would get the lead out."
+ },
+ {
+  "id": 75,
+  "source": "variety",
+  "text": "What time does the store open?"
+ },
+ {
+  "id": 76,
+  "source": "variety",
+  "text": "Why did you do that?!"
+ },
+ {
+  "id": 77,
+  "source": "variety",
+  "text": "How much does this cost?"
+ },
+ {
+  "id": 78,
+  "source": "variety",
+  "text": "Where are my keys?"
+ },
+ {
+  "id": 79,
+  "source": "variety",
+  "text": "Who left the door open?"
+ },
+ {
+  "id": 80,
+  "source": "variety",
+  "text": "That's incredible!"
+ },
+ {
+  "id": 81,
+  "source": "variety",
+  "text": "Stop right there!"
+ },
+ {
+  "id": 82,
+  "source": "variety",
+  "text": "I can't believe it!"
+ },
+ {
+  "id": 83,
+  "source": "variety",
+  "text": "Are you serious?"
+ },
+ {
+  "id": 84,
+  "source": "variety",
+  "text": "Wow, what a view!"
+ },
+ {
+  "id": 85,
+  "source": "variety",
+  "text": "\"Come here,\" she said softly."
+ },
+ {
+  "id": 86,
+  "source": "variety",
+  "text": "He replied, \"I don't know what you mean.\""
+ },
+ {
+  "id": 87,
+  "source": "variety",
+  "text": "'Wait,' he whispered, 'did you hear that?'"
+ },
+ {
+  "id": 88,
+  "source": "variety",
+  "text": "The sign read: No Parking After 6 PM."
+ },
+ {
+  "id": 89,
+  "source": "variety",
+  "text": "She asked, \"Is everything okay?\""
+ },
+ {
+  "id": 90,
+  "source": "variety",
+  "text": "Wait... what just happened?"
+ },
+ {
+  "id": 91,
+  "source": "variety",
+  "text": "Well, I suppose so."
+ },
+ {
+  "id": 92,
+  "source": "variety",
+  "text": "Yes! Finally! It works!"
+ },
+ {
+  "id": 93,
+  "source": "variety",
+  "text": "Hmm, let me think about it."
+ },
+ {
+  "id": 94,
+  "source": "variety",
+  "text": "Okay, fine, whatever you say."
+ },
+ {
+  "id": 95,
+  "source": "variety",
+  "text": "The committee, after much deliberation and several heated debates, finally reached a unanimous decision on the budget proposal."
+ },
+ {
+  "id": 96,
+  "source": "variety",
+  "text": "Although the weather forecast predicted rain all week, the skies remained stubbornly clear throughout the entire festival."
+ },
+ {
+  "id": 97,
+  "source": "variety",
+  "text": "Scientists at the university announced a breakthrough in battery technology that could triple the range of electric vehicles."
+ },
+ {
+  "id": 98,
+  "source": "variety",
+  "text": "The novel, which took the author nearly a decade to complete, explores themes of memory, loss, and redemption across three generations."
+ },
+ {
+  "id": 99,
+  "source": "variety",
+  "text": "If you had told me a year ago that I would be standing here today, I would have laughed and called you crazy."
+ },
+ {
+  "id": 100,
+  "source": "variety",
+  "text": "Hello there."
+ },
+ {
+  "id": 101,
+  "source": "variety",
+  "text": "Good morning."
+ },
+ {
+  "id": 102,
+  "source": "variety",
+  "text": "See you later."
+ },
+ {
+  "id": 103,
+  "source": "variety",
+  "text": "Thank you."
+ },
+ {
+  "id": 104,
+  "source": "variety",
+  "text": "No problem."
+ },
+ {
+  "id": 105,
+  "source": "variety",
+  "text": "How are you?"
+ },
+ {
+  "id": 106,
+  "source": "variety",
+  "text": "I'm fine."
+ },
+ {
+  "id": 107,
+  "source": "variety",
+  "text": "What's up?"
+ },
+ {
+  "id": 108,
+  "source": "variety",
+  "text": "Nice work."
+ },
+ {
+  "id": 109,
+  "source": "variety",
+  "text": "Take care."
+ },
+ {
+  "id": 110,
+  "source": "variety",
+  "text": "The function returns a tuple of two integers."
+ },
+ {
+  "id": 111,
+  "source": "variety",
+  "text": "Compile the program with optimization flags enabled."
+ },
+ {
+  "id": 112,
+  "source": "variety",
+  "text": "The database schema needs a migration before deployment."
+ },
+ {
+  "id": 113,
+  "source": "variety",
+  "text": "Memory usage peaked at 46 megabytes during the test."
+ },
+ {
+  "id": 114,
+  "source": "variety",
+  "text": "The API returns JSON with a status field."
+ },
+ {
+  "id": 115,
+  "source": "variety",
+  "text": "Latency dropped from 90 milliseconds to 12."
+ },
+ {
+  "id": 116,
+  "source": "variety",
+  "text": "The model has 7.88 million parameters in int8 format."
+ },
+ {
+  "id": 117,
+  "source": "variety",
+  "text": "Run the benchmark with median of 5 iterations."
+ },
+ {
+  "id": 118,
+  "source": "variety",
+  "text": "The decoder never upsamples the spectrogram."
+ },
+ {
+  "id": 119,
+  "source": "variety",
+  "text": "Peak RSS was 46 MB compared to 226 MB for the baseline."
+ },
+ {
+  "id": 120,
+  "source": "variety",
+  "text": "I need to pick up groceries on the way home."
+ },
+ {
+  "id": 121,
+  "source": "variety",
+  "text": "The traffic was terrible this morning."
+ },
+ {
+  "id": 122,
+  "source": "variety",
+  "text": "Did you remember to lock the door?"
+ },
+ {
+  "id": 123,
+  "source": "variety",
+  "text": "Let's grab coffee after the meeting."
+ },
+ {
+  "id": 124,
+  "source": "variety",
+  "text": "The kids are playing in the backyard."
+ },
+ {
+  "id": 125,
+  "source": "variety",
+  "text": "I forgot my umbrella again."
+ },
+ {
+  "id": 126,
+  "source": "variety",
+  "text": "The movie starts in twenty minutes."
+ },
+ {
+  "id": 127,
+  "source": "variety",
+  "text": "Can you pass the salt, please?"
+ },
+ {
+  "id": 128,
+  "source": "variety",
+  "text": "My phone battery is almost dead."
+ },
+ {
+  "id": 129,
+  "source": "variety",
+  "text": "The dog needs a walk before dinner."
+ },
+ {
+  "id": 130,
+  "source": "variety",
+  "text": "Alice and Bob met in Paris last spring."
+ },
+ {
+  "id": 131,
+  "source": "variety",
+  "text": "The Amazon River flows through South America."
+ },
+ {
+  "id": 132,
+  "source": "variety",
+  "text": "Mount Everest is the tallest peak on Earth."
+ },
+ {
+  "id": 133,
+  "source": "variety",
+  "text": "She moved from Chicago to Seattle in June."
+ },
+ {
+  "id": 134,
+  "source": "variety",
+  "text": "The Pacific Ocean covers a third of the planet."
+ },
+ {
+  "id": 135,
+  "source": "variety",
+  "text": "Shakespeare wrote Romeo and Juliet around 1595."
+ },
+ {
+  "id": 136,
+  "source": "variety",
+  "text": "The Louvre Museum houses the Mona Lisa."
+ },
+ {
+  "id": 137,
+  "source": "variety",
+  "text": "Tokyo is one of the largest cities in the world."
+ },
+ {
+  "id": 138,
+  "source": "variety",
+  "text": "The Sahara stretches across northern Africa."
+ },
+ {
+  "id": 139,
+  "source": "variety",
+  "text": "He studied abroad in Melbourne for a semester."
+ },
+ {
+  "id": 140,
+  "source": "variety",
+  "text": "The README.md file explains the setup."
+ },
+ {
+  "id": 141,
+  "source": "variety",
+  "text": "Press Ctrl+C to cancel the operation."
+ },
+ {
+  "id": 142,
+  "source": "variety",
+  "text": "The temperature is 25C outside."
+ },
+ {
+  "id": 143,
+  "source": "variety",
+  "text": "Email me at user@example.org for details."
+ },
+ {
+  "id": 144,
+  "source": "variety",
+  "text": "The version string is v1.1.0."
+ },
+ {
+  "id": 145,
+  "source": "variety",
+  "text": "Use #FF0000 for the red channel."
+ },
+ {
+  "id": 146,
+  "source": "variety",
+  "text": "The ratio is roughly 3:1."
+ },
+ {
+  "id": 147,
+  "source": "variety",
+  "text": "Add 50g of sugar to the mixture."
+ },
+ {
+  "id": 148,
+  "source": "variety",
+  "text": "The event runs from 10 AM to 4 PM."
+ },
+ {
+  "id": 149,
+  "source": "variety",
+  "text": "His GPA was 3.8 out of 4.0."
+ },
+ {
+  "id": 150,
+  "source": "variety",
+  "text": "I don't think that's a good idea."
+ },
+ {
+  "id": 151,
+  "source": "variety",
+  "text": "She's been waiting for over an hour."
+ },
+ {
+  "id": 152,
+  "source": "variety",
+  "text": "They won't tell us what happened."
+ },
+ {
+  "id": 153,
+  "source": "variety",
+  "text": "It's raining cats and dogs out there."
+ },
+ {
+  "id": 154,
+  "source": "variety",
+  "text": "We'd better leave now, shouldn't we?"
+ },
+ {
+  "id": 155,
+  "source": "variety",
+  "text": "You're gonna love this place."
+ },
+ {
+  "id": 156,
+  "source": "variety",
+  "text": "He ain't seen nothing yet."
+ },
+ {
+  "id": 157,
+  "source": "variety",
+  "text": "I'd rather stay home tonight."
+ },
+ {
+  "id": 158,
+  "source": "variety",
+  "text": "There's nothing left to do."
+ },
+ {
+  "id": 159,
+  "source": "variety",
+  "text": "Let's call it a day."
+ },
+ {
+  "id": 160,
+  "source": "variety",
+  "text": "The V8 engine roared to life."
+ },
+ {
+  "id": 161,
+  "source": "variety",
+  "text": "She uses a 4K monitor for design work."
+ },
+ {
+  "id": 162,
+  "source": "variety",
+  "text": "The MP3 format changed music forever."
+ },
+ {
+  "id": 163,
+  "source": "variety",
+  "text": "He bought a 3D printer last month."
+ },
+ {
+  "id": 164,
+  "source": "variety",
+  "text": "The Wi-Fi password is on the fridge."
+ },
+ {
+  "id": 165,
+  "source": "variety",
+  "text": "The plan was simple: wake early, run far, sleep well."
+ },
+ {
+  "id": 166,
+  "source": "variety",
+  "text": "He had three options; he chose the hardest one."
+ },
+ {
+  "id": 167,
+  "source": "variety",
+  "text": "Remember this: nothing worth having comes easy."
+ },
+ {
+  "id": 168,
+  "source": "variety",
+  "text": "The recipe calls for flour, eggs, and milk; mix well."
+ },
+ {
+  "id": 169,
+  "source": "variety",
+  "text": "There are two kinds of people; be the kind who builds."
+ },
+ {
+  "id": 170,
+  "source": "variety",
+  "text": "The result (which surprised everyone) was correct."
+ },
+ {
+  "id": 171,
+  "source": "variety",
+  "text": "She paused, then continued, as if remembering something important."
+ },
+ {
+  "id": 172,
+  "source": "variety",
+  "text": "The answer, oddly enough, was already in the manual."
+ },
+ {
+  "id": 173,
+  "source": "variety",
+  "text": "He won the race (barely) and celebrated all night."
+ },
+ {
+  "id": 174,
+  "source": "variety",
+  "text": "The theory, though controversial, gained support over time."
+ },
+ {
+  "id": 175,
+  "source": "variety",
+  "text": "The total came to 670487 units this quarter."
+ },
+ {
+  "id": 176,
+  "source": "variety",
+  "text": "The total came to 116739 units this quarter."
+ },
+ {
+  "id": 177,
+  "source": "variety",
+  "text": "The total came to 26225 units this quarter."
+ },
+ {
+  "id": 178,
+  "source": "variety",
+  "text": "The total came to 777572 units this quarter."
+ },
+ {
+  "id": 179,
+  "source": "variety",
+  "text": "The total came to 288389 units this quarter."
+ },
+ {
+  "id": 180,
+  "source": "variety",
+  "text": "The total came to 256787 units this quarter."
+ },
+ {
+  "id": 181,
+  "source": "variety",
+  "text": "The total came to 234053 units this quarter."
+ },
+ {
+  "id": 182,
+  "source": "variety",
+  "text": "The total came to 146316 units this quarter."
+ },
+ {
+  "id": 183,
+  "source": "variety",
+  "text": "The total came to 772246 units this quarter."
+ },
+ {
+  "id": 184,
+  "source": "variety",
+  "text": "The total came to 107473 units this quarter."
+ },
+ {
+  "id": 185,
+  "source": "variety",
+  "text": "The total came to 709570 units this quarter."
+ },
+ {
+  "id": 186,
+  "source": "variety",
+  "text": "The total came to 776646 units this quarter."
+ },
+ {
+  "id": 187,
+  "source": "variety",
+  "text": "The total came to 935518 units this quarter."
+ },
+ {
+  "id": 188,
+  "source": "variety",
+  "text": "The total came to 571858 units this quarter."
+ },
+ {
+  "id": 189,
+  "source": "variety",
+  "text": "The total came to 91161 units this quarter."
+ },
+ {
+  "id": 190,
+  "source": "variety",
+  "text": "The total came to 619176 units this quarter."
+ },
+ {
+  "id": 191,
+  "source": "variety",
+  "text": "The total came to 442417 units this quarter."
+ },
+ {
+  "id": 192,
+  "source": "variety",
+  "text": "The total came to 33326 units this quarter."
+ },
+ {
+  "id": 193,
+  "source": "variety",
+  "text": "The total came to 31244 units this quarter."
+ },
+ {
+  "id": 194,
+  "source": "variety",
+  "text": "The total came to 98246 units this quarter."
+ },
+ {
+  "id": 195,
+  "source": "variety",
+  "text": "The total came to 229258 units this quarter."
+ },
+ {
+  "id": 196,
+  "source": "variety",
+  "text": "The total came to 243962 units this quarter."
+ },
+ {
+  "id": 197,
+  "source": "variety",
+  "text": "The total came to 529903 units this quarter."
+ },
+ {
+  "id": 198,
+  "source": "variety",
+  "text": "The total came to 631262 units this quarter."
+ },
+ {
+  "id": 199,
+  "source": "variety",
+  "text": "The total came to 27824 units this quarter."
+ },
+ {
+  "id": 200,
+  "source": "variety",
+  "text": "The total came to 588508 units this quarter."
+ },
+ {
+  "id": 201,
+  "source": "variety",
+  "text": "The total came to 208496 units this quarter."
+ },
+ {
+  "id": 202,
+  "source": "variety",
+  "text": "The total came to 750800 units this quarter."
+ },
+ {
+  "id": 203,
+  "source": "variety",
+  "text": "The total came to 681453 units this quarter."
+ },
+ {
+  "id": 204,
+  "source": "variety",
+  "text": "The total came to 735392 units this quarter."
+ },
+ {
+  "id": 205,
+  "source": "variety",
+  "text": "The total came to 571412 units this quarter."
+ },
+ {
+  "id": 206,
+  "source": "variety",
+  "text": "The total came to 439898 units this quarter."
+ },
+ {
+  "id": 207,
+  "source": "variety",
+  "text": "The total came to 231148 units this quarter."
+ },
+ {
+  "id": 208,
+  "source": "variety",
+  "text": "The total came to 471029 units this quarter."
+ },
+ {
+  "id": 209,
+  "source": "variety",
+  "text": "The total came to 617889 units this quarter."
+ },
+ {
+  "id": 210,
+  "source": "variety",
+  "text": "The total came to 291704 units this quarter."
+ },
+ {
+  "id": 211,
+  "source": "variety",
+  "text": "The total came to 848749 units this quarter."
+ },
+ {
+  "id": 212,
+  "source": "variety",
+  "text": "The total came to 911527 units this quarter."
+ },
+ {
+  "id": 213,
+  "source": "variety",
+  "text": "The total came to 6814 units this quarter."
+ },
+ {
+  "id": 214,
+  "source": "variety",
+  "text": "The total came to 795667 units this quarter."
+ },
+ {
+  "id": 215,
+  "source": "variety",
+  "text": "The bus arrives at 3:45 on weekdays."
+ },
+ {
+  "id": 216,
+  "source": "variety",
+  "text": "The bus arrives at 7:22 on weekdays."
+ },
+ {
+  "id": 217,
+  "source": "variety",
+  "text": "The bus arrives at 5:10 on weekdays."
+ },
+ {
+  "id": 218,
+  "source": "variety",
+  "text": "The bus arrives at 4:49 on weekdays."
+ },
+ {
+  "id": 219,
+  "source": "variety",
+  "text": "The bus arrives at 6:07 on weekdays."
+ },
+ {
+  "id": 220,
+  "source": "variety",
+  "text": "The bus arrives at 2:25 on weekdays."
+ },
+ {
+  "id": 221,
+  "source": "variety",
+  "text": "The bus arrives at 2:23 on weekdays."
+ },
+ {
+  "id": 222,
+  "source": "variety",
+  "text": "The bus arrives at 6:39 on weekdays."
+ },
+ {
+  "id": 223,
+  "source": "variety",
+  "text": "The bus arrives at 5:52 on weekdays."
+ },
+ {
+  "id": 224,
+  "source": "variety",
+  "text": "The bus arrives at 1:47 on weekdays."
+ },
+ {
+  "id": 225,
+  "source": "variety",
+  "text": "The bus arrives at 8:35 on weekdays."
+ },
+ {
+  "id": 226,
+  "source": "variety",
+  "text": "The bus arrives at 2:36 on weekdays."
+ },
+ {
+  "id": 227,
+  "source": "variety",
+  "text": "The bus arrives at 5:54 on weekdays."
+ },
+ {
+  "id": 228,
+  "source": "variety",
+  "text": "The bus arrives at 11:40 on weekdays."
+ },
+ {
+  "id": 229,
+  "source": "variety",
+  "text": "The report was filed on 6/19/1924 without errors."
+ },
+ {
+  "id": 230,
+  "source": "variety",
+  "text": "The report was filed on 12/3/1905 without errors."
+ },
+ {
+  "id": 231,
+  "source": "variety",
+  "text": "The report was filed on 11/8/1998 without errors."
+ },
+ {
+  "id": 232,
+  "source": "variety",
+  "text": "The report was filed on 5/3/2009 without errors."
+ },
+ {
+  "id": 233,
+  "source": "variety",
+  "text": "The report was filed on 4/28/1912 without errors."
+ },
+ {
+  "id": 234,
+  "source": "variety",
+  "text": "The report was filed on 7/9/1958 without errors."
+ },
+ {
+  "id": 235,
+  "source": "variety",
+  "text": "The report was filed on 11/27/1946 without errors."
+ },
+ {
+  "id": 236,
+  "source": "variety",
+  "text": "The report was filed on 3/12/1945 without errors."
+ },
+ {
+  "id": 237,
+  "source": "variety",
+  "text": "The report was filed on 4/22/1934 without errors."
+ },
+ {
+  "id": 238,
+  "source": "variety",
+  "text": "The report was filed on 12/22/1982 without errors."
+ },
+ {
+  "id": 239,
+  "source": "variety",
+  "text": "The report was filed on 2/20/1981 without errors."
+ },
+ {
+  "id": 240,
+  "source": "variety",
+  "text": "The report was filed on 3/18/1993 without errors."
+ },
+ {
+  "id": 241,
+  "source": "variety",
+  "text": "The report was filed on 4/6/1959 without errors."
+ },
+ {
+  "id": 242,
+  "source": "variety",
+  "text": "The report was filed on 7/9/2018 without errors."
+ },
+ {
+  "id": 243,
+  "source": "variety",
+  "text": "The report was filed on 11/23/1971 without errors."
+ },
+ {
+  "id": 244,
+  "source": "variety",
+  "text": "On the 8th of the month, the office closes early."
+ },
+ {
+  "id": 245,
+  "source": "variety",
+  "text": "On the 22th of the month, the office closes early."
+ },
+ {
+  "id": 246,
+  "source": "variety",
+  "text": "On the 11th of the month, the office closes early."
+ },
+ {
+  "id": 247,
+  "source": "variety",
+  "text": "On the 27th of the month, the office closes early."
+ },
+ {
+  "id": 248,
+  "source": "variety",
+  "text": "On the 25th of the month, the office closes early."
+ },
+ {
+  "id": 249,
+  "source": "variety",
+  "text": "On the 2th of the month, the office closes early."
+ },
+ {
+  "id": 250,
+  "source": "variety",
+  "text": "On the 26th of the month, the office closes early."
+ },
+ {
+  "id": 251,
+  "source": "variety",
+  "text": "On the 13th of the month, the office closes early."
+ },
+ {
+  "id": 252,
+  "source": "variety",
+  "text": "On the 9th of the month, the office closes early."
+ },
+ {
+  "id": 253,
+  "source": "variety",
+  "text": "On the 3th of the month, the office closes early."
+ },
+ {
+  "id": 254,
+  "source": "variety",
+  "text": "The measured value was 27.72 millimeters."
+ },
+ {
+  "id": 255,
+  "source": "variety",
+  "text": "The measured value was 91.40 millimeters."
+ },
+ {
+  "id": 256,
+  "source": "variety",
+  "text": "The measured value was 27.83 millimeters."
+ },
+ {
+  "id": 257,
+  "source": "variety",
+  "text": "The measured value was 63.50 millimeters."
+ },
+ {
+  "id": 258,
+  "source": "variety",
+  "text": "The measured value was 82.58 millimeters."
+ },
+ {
+  "id": 259,
+  "source": "variety",
+  "text": "The measured value was 18.33 millimeters."
+ },
+ {
+  "id": 260,
+  "source": "variety",
+  "text": "The measured value was 17.31 millimeters."
+ },
+ {
+  "id": 261,
+  "source": "variety",
+  "text": "The measured value was 95.71 millimeters."
+ },
+ {
+  "id": 262,
+  "source": "variety",
+  "text": "The measured value was 68.33 millimeters."
+ },
+ {
+  "id": 263,
+  "source": "variety",
+  "text": "The measured value was 95.74 millimeters."
+ },
+ {
+  "id": 264,
+  "source": "variety",
+  "text": "The measured value was 54.74 millimeters."
+ },
+ {
+  "id": 265,
+  "source": "variety",
+  "text": "The measured value was 51.46 millimeters."
+ },
+ {
+  "id": 266,
+  "source": "variety",
+  "text": "The measured value was 28.17 millimeters."
+ },
+ {
+  "id": 267,
+  "source": "variety",
+  "text": "The measured value was 65.63 millimeters."
+ },
+ {
+  "id": 268,
+  "source": "variety",
+  "text": "The measured value was 11.96 millimeters."
+ },
+ {
+  "id": 269,
+  "source": "variety",
+  "text": "The invoice listed $772.14 in fees."
+ },
+ {
+  "id": 270,
+  "source": "variety",
+  "text": "The invoice listed $2505.80 in fees."
+ },
+ {
+  "id": 271,
+  "source": "variety",
+  "text": "The invoice listed $2622.87 in fees."
+ },
+ {
+  "id": 272,
+  "source": "variety",
+  "text": "The invoice listed $6917.76 in fees."
+ },
+ {
+  "id": 273,
+  "source": "variety",
+  "text": "The invoice listed $1041.49 in fees."
+ },
+ {
+  "id": 274,
+  "source": "variety",
+  "text": "The invoice listed $6253.76 in fees."
+ },
+ {
+  "id": 275,
+  "source": "variety",
+  "text": "The invoice listed $7669.67 in fees."
+ },
+ {
+  "id": 276,
+  "source": "variety",
+  "text": "The invoice listed $4120.70 in fees."
+ },
+ {
+  "id": 277,
+  "source": "variety",
+  "text": "The invoice listed $189.87 in fees."
+ },
+ {
+  "id": 278,
+  "source": "variety",
+  "text": "The invoice listed $1877.87 in fees."
+ },
+ {
+  "id": 279,
+  "source": "variety",
+  "text": "The invoice listed $8798.96 in fees."
+ },
+ {
+  "id": 280,
+  "source": "variety",
+  "text": "The invoice listed $4372.98 in fees."
+ },
+ {
+  "id": 281,
+  "source": "variety",
+  "text": "The invoice listed $5574.14 in fees."
+ },
+ {
+  "id": 282,
+  "source": "variety",
+  "text": "The invoice listed $4809.55 in fees."
+ },
+ {
+  "id": 283,
+  "source": "variety",
+  "text": "The invoice listed $2592.58 in fees."
+ },
+ {
+  "id": 284,
+  "source": "variety",
+  "text": "He said the word zero out loud, twice."
+ },
+ {
+  "id": 285,
+  "source": "variety",
+  "text": "He said the word sixteen out loud, twice."
+ },
+ {
+  "id": 286,
+  "source": "variety",
+  "text": "He said the word eleven out loud, twice."
+ },
+ {
+  "id": 287,
+  "source": "variety",
+  "text": "He said the word six out loud, twice."
+ },
+ {
+  "id": 288,
+  "source": "variety",
+  "text": "He said the word nineteen out loud, twice."
+ },
+ {
+  "id": 289,
+  "source": "variety",
+  "text": "He said the word twelve out loud, twice."
+ },
+ {
+  "id": 290,
+  "source": "variety",
+  "text": "He said the word nine out loud, twice."
+ },
+ {
+  "id": 291,
+  "source": "variety",
+  "text": "He said the word fifty out loud, twice."
+ },
+ {
+  "id": 292,
+  "source": "variety",
+  "text": "He said the word ten out loud, twice."
+ },
+ {
+  "id": 293,
+  "source": "variety",
+  "text": "There were 12 applicants for the single position."
+ },
+ {
+  "id": 294,
+  "source": "variety",
+  "text": "There were 17 applicants for the single position."
+ },
+ {
+  "id": 295,
+  "source": "variety",
+  "text": "There were 2 applicants for the single position."
+ },
+ {
+  "id": 296,
+  "source": "variety",
+  "text": "There were 5 applicants for the single position."
+ },
+ {
+  "id": 297,
+  "source": "variety",
+  "text": "There were 13 applicants for the single position."
+ },
+ {
+  "id": 298,
+  "source": "variety",
+  "text": "There were 11 applicants for the single position."
+ },
+ {
+  "id": 299,
+  "source": "variety",
+  "text": "There were 9 applicants for the single position."
+ },
+ {
+  "id": 300,
+  "source": "variety",
+  "text": "There were 3 applicants for the single position."
+ },
+ {
+  "id": 301,
+  "source": "variety",
+  "text": "There were 20 applicants for the single position."
+ },
+ {
+  "id": 302,
+  "source": "variety",
+  "text": "The lead pipe will lead to the basement."
+ },
+ {
+  "id": 303,
+  "source": "variety",
+  "text": "I will read the report I read yesterday."
+ },
+ {
+  "id": 304,
+  "source": "variety",
+  "text": "The live broadcast shows where they live."
+ },
+ {
+  "id": 305,
+  "source": "variety",
+  "text": "Wind the sail before the wind shifts."
+ },
+ {
+  "id": 306,
+  "source": "variety",
+  "text": "He took a bow before tying the bow knot."
+ },
+ {
+  "id": 307,
+  "source": "variety",
+  "text": "Close the door; we are close to the edge."
+ },
+ {
+  "id": 308,
+  "source": "variety",
+  "text": "What does she think the does eat?"
+ },
+ {
+  "id": 309,
+  "source": "variety",
+  "text": "Wait a minute while I minute the meeting."
+ },
+ {
+  "id": 310,
+  "source": "variety",
+  "text": "The object of the study may object to publicity."
+ },
+ {
+  "id": 311,
+  "source": "variety",
+  "text": "They present a gift for the present occasion."
+ },
+ {
+  "id": 312,
+  "source": "variety",
+  "text": "The farms produce fresh produce daily."
+ },
+ {
+  "id": 313,
+  "source": "variety",
+  "text": "They project the project will finish on time."
+ },
+ {
+  "id": 314,
+  "source": "variety",
+  "text": "We record every record in the archive."
+ },
+ {
+  "id": 315,
+  "source": "variety",
+  "text": "The subject may subject us to questions."
+ },
+ {
+  "id": 316,
+  "source": "variety",
+  "text": "You use the spare room for storage use."
+ },
+ {
+  "id": 317,
+  "source": "variety",
+  "text": "The bass line was as low as a bass drum."
+ },
+ {
+  "id": 318,
+  "source": "variety",
+  "text": "The dove dove quickly out of sight."
+ },
+ {
+  "id": 319,
+  "source": "variety",
+  "text": "A tear rolled down as he began to tear the letter."
+ },
+ {
+  "id": 320,
+  "source": "variety",
+  "text": "The wound was caused by a wound-up spring."
+ },
+ {
+  "id": 321,
+  "source": "variety",
+  "text": "The content of the talk was content to remain secret."
+ },
+ {
+  "id": 322,
+  "source": "variety",
+  "text": "Really? Yes, absolutely, without a doubt!"
+ },
+ {
+  "id": 323,
+  "source": "variety",
+  "text": "Well... I mean, maybe? Sure, why not."
+ },
+ {
+  "id": 324,
+  "source": "variety",
+  "text": "Item one: the basics. Item two: the details. Item three: the rest."
+ },
+ {
+  "id": 325,
+  "source": "variety",
+  "text": "He said it was fine (more or less) and moved on."
+ },
+ {
+  "id": 326,
+  "source": "variety",
+  "text": "The price is $9.99, not $19.99, and that is final."
+ },
+ {
+  "id": 327,
+  "source": "variety",
+  "text": "Photosynthesis is the process used by plants to convert light energy into chemical energy."
+ },
+ {
+  "id": 328,
+  "source": "variety",
+  "text": "The Industrial Revolution began in Great Britain during the late eighteenth century."
+ },
+ {
+  "id": 329,
+  "source": "variety",
+  "text": "Water boils at one hundred degrees Celsius at standard atmospheric pressure."
+ },
+ {
+  "id": 330,
+  "source": "variety",
+  "text": "The human brain contains roughly eighty-six billion neurons connected by trillions of synapses."
+ },
+ {
+  "id": 331,
+  "source": "variety",
+  "text": "Mount Everest was first summited in 1953 by Edmund Hillary and Tenzing Norgay."
+ },
+ {
+  "id": 332,
+  "source": "variety",
+  "text": "The Great Wall of China stretches for thousands of kilometers across northern China."
+ },
+ {
+  "id": 333,
+  "source": "variety",
+  "text": "Antibiotics revolutionized medicine in the twentieth century by making bacterial infections treatable."
+ },
+ {
+  "id": 334,
+  "source": "variety",
+  "text": "The internet began as a research project funded by the United States Department of Defense."
+ },
+ {
+  "id": 335,
+  "source": "variety",
+  "text": "Bees communicate the location of food through a behavior known as the waggle dance."
+ },
+ {
+  "id": 336,
+  "source": "variety",
+  "text": "The Pacific Ocean is the largest and deepest of Earth's ocean divisions."
+ },
+ {
+  "id": 337,
+  "source": "variety",
+  "text": "Coffee is one of the most widely consumed beverages in the world today."
+ },
+ {
+  "id": 338,
+  "source": "variety",
+  "text": "The printing press, invented by Johannes Gutenberg, transformed the spread of knowledge."
+ },
+ {
+  "id": 339,
+  "source": "variety",
+  "text": "Electric cars were popular in the late nineteenth century before gasoline vehicles dominated."
+ },
+ {
+  "id": 340,
+  "source": "variety",
+  "text": "The Sahara Desert has expanded and contracted over thousands of years due to climate cycles."
+ },
+ {
+  "id": 341,
+  "source": "variety",
+  "text": "Shakespeare wrote at least thirty-seven plays and one hundred fifty-four sonnets."
+ },
+ {
+  "id": 342,
+  "source": "variety",
+  "text": "The human heart beats approximately one hundred thousand times every single day."
+ },
+ {
+  "id": 343,
+  "source": "variety",
+  "text": "Vaccination programs have eliminated smallpox, which once killed millions of people annually."
+ },
+ {
+  "id": 344,
+  "source": "variety",
+  "text": "The Roman Empire at its height controlled territory spanning three continents."
+ },
+ {
+  "id": 345,
+  "source": "variety",
+  "text": "Photosynthesis in ocean plankton produces roughly half of the oxygen we breathe."
+ },
+ {
+  "id": 346,
+  "source": "variety",
+  "text": "The Library of Alexandria was one of the largest and most significant libraries of the ancient world."
+ },
+ {
+  "id": 347,
+  "source": "variety",
+  "text": "Gravity is the force by which all objects with mass attract one another."
+ },
+ {
+  "id": 348,
+  "source": "variety",
+  "text": "The Olympic Games originated in ancient Greece as a festival honoring Zeus."
+ },
+ {
+  "id": 349,
+  "source": "variety",
+  "text": "Rainbows form when sunlight is refracted, reflected, and dispersed through water droplets."
+ },
+ {
+  "id": 350,
+  "source": "variety",
+  "text": "The domestic dog was the first animal to be domesticated by humans."
+ },
+ {
+  "id": 351,
+  "source": "variety",
+  "text": "Language evolution is studied by linguists, anthropologists, and cognitive scientists alike."
+ },
+ {
+  "id": 352,
+  "source": "variety",
+  "text": "The steam engine was a driving force behind the mechanization of manufacturing."
+ },
+ {
+  "id": 353,
+  "source": "variety",
+  "text": "Coral reefs support an estimated twenty-five percent of all marine species."
+ },
+ {
+  "id": 354,
+  "source": "variety",
+  "text": "The speed of light in a vacuum is exactly two hundred ninety-nine million meters per second."
+ },
+ {
+  "id": 355,
+  "source": "variety",
+  "text": "Democracy as a system of government has roots in ancient Athens."
+ },
+ {
+  "id": 356,
+  "source": "variety",
+  "text": "The Amazon rainforest produces a significant portion of its own rainfall through transpiration."
+ },
+ {
+  "id": 357,
+  "source": "variety",
+  "text": "\"Are you coming?\" she asked from the hallway."
+ },
+ {
+  "id": 358,
+  "source": "variety",
+  "text": "\"In a minute,\" he called back, still tying his shoes."
+ },
+ {
+  "id": 359,
+  "source": "variety",
+  "text": "\"We are going to be late,\" she warned, tapping her foot."
+ },
+ {
+  "id": 360,
+  "source": "variety",
+  "text": "\"I am ready now,\" he said, grabbing his coat."
+ },
+ {
+  "id": 361,
+  "source": "variety",
+  "text": "\"Finally,\" she said with a smile, and they left together."
+ },
+ {
+  "id": 362,
+  "source": "variety",
+  "text": "\"What did the doctor say?\" he asked quietly."
+ },
+ {
+  "id": 363,
+  "source": "variety",
+  "text": "\"It is nothing serious,\" she replied, though she looked worried."
+ },
+ {
+  "id": 364,
+  "source": "variety",
+  "text": "\"Do you want me to come with you?\" he offered."
+ },
+ {
+  "id": 365,
+  "source": "variety",
+  "text": "\"No, I can manage,\" she said, but her voice shook slightly."
+ },
+ {
+  "id": 366,
+  "source": "variety",
+  "text": "\"Call me the moment you hear anything,\" he insisted."
+ },
+ {
+  "id": 367,
+  "source": "variety",
+  "text": "\"I will,\" she promised, and she meant it."
+ },
+ {
+  "id": 368,
+  "source": "variety",
+  "text": "\"How long have we known each other?\" she asked suddenly."
+ },
+ {
+  "id": 369,
+  "source": "variety",
+  "text": "\"Fifteen years, give or take,\" he answered without hesitation."
+ },
+ {
+  "id": 370,
+  "source": "variety",
+  "text": "\"It feels longer,\" she said, laughing softly."
+ },
+ {
+  "id": 371,
+  "source": "variety",
+  "text": "\"That is because you have a bad memory,\" he teased."
+ },
+ {
+  "id": 372,
+  "source": "variety",
+  "text": "\"Maybe,\" she admitted, \"but you love me anyway.\""
+ },
+ {
+  "id": 373,
+  "source": "variety",
+  "text": "\"That I do,\" he said, and he closed the door behind them."
+ },
+ {
+  "id": 374,
+  "source": "variety",
+  "text": "\"Where should we eat?\" she asked as they walked."
+ },
+ {
+  "id": 375,
+  "source": "variety",
+  "text": "\"Anywhere without a wait,\" he said, and they both laughed."
+ },
+ {
+  "id": 376,
+  "source": "variety",
+  "text": "\"Deal,\" she said, and they turned the corner together."
+ },
+ {
+  "id": 377,
+  "source": "variety",
+  "text": "THIS IS IMPORTANT, READ IT CAREFULLY."
+ },
+ {
+  "id": 378,
+  "source": "variety",
+  "text": "Do NOT press the red button."
+ },
+ {
+  "id": 379,
+  "source": "variety",
+  "text": "The label said FRAGILE in large letters."
+ },
+ {
+  "id": 380,
+  "source": "variety",
+  "text": "He typed YES and hit enter."
+ },
+ {
+  "id": 381,
+  "source": "variety",
+  "text": "The sign warned: DANGER, HIGH VOLTAGE."
+ },
+ {
+  "id": 382,
+  "source": "variety",
+  "text": "The city council approved a new housing development on the north side of town."
+ },
+ {
+  "id": 383,
+  "source": "variety",
+  "text": "Officials said the water supply is safe, despite earlier concerns about contamination."
+ },
+ {
+  "id": 384,
+  "source": "variety",
+  "text": "The local school district announced a two-hour delay for Tuesday because of snow."
+ },
+ {
+  "id": 385,
+  "source": "variety",
+  "text": "Police are investigating a report of a break-in on Elm Street late Friday night."
+ },
+ {
+  "id": 386,
+  "source": "variety",
+  "text": "The hospital reported that all three patients are in stable condition."
+ },
+ {
+  "id": 387,
+  "source": "variety",
+  "text": "Residents along the coast were asked to evacuate ahead of the approaching storm."
+ },
+ {
+  "id": 388,
+  "source": "variety",
+  "text": "The highway reopened early this morning after crews cleared the wreckage."
+ },
+ {
+  "id": 389,
+  "source": "variety",
+  "text": "A new study links regular exercise to improved memory in adults over sixty."
+ },
+ {
+  "id": 390,
+  "source": "variety",
+  "text": "The company said it plans to hire two hundred workers by the end of the year."
+ },
+ {
+  "id": 391,
+  "source": "variety",
+  "text": "Firefighters contained the warehouse fire within three hours, officials said."
+ },
+ {
+  "id": 392,
+  "source": "variety",
+  "text": "The library will extend its hours starting next month, the director announced."
+ },
+ {
+  "id": 393,
+  "source": "variety",
+  "text": "Transit officials warned riders to expect delays on the blue line this weekend."
+ },
+ {
+  "id": 394,
+  "source": "variety",
+  "text": "The museum unveiled a restored painting that had been hidden in storage for decades."
+ },
+ {
+  "id": 395,
+  "source": "variety",
+  "text": "School board members voted four to one in favor of the new calendar."
+ },
+ {
+  "id": 396,
+  "source": "variety",
+  "text": "The farmers market will move indoors for the winter, organizers said."
+ },
+ {
+  "id": 397,
+  "source": "variety",
+  "text": "A section of the park will close for repairs, according to the parks department."
+ },
+ {
+  "id": 398,
+  "source": "variety",
+  "text": "The power company restored electricity to nearly five thousand homes overnight."
+ },
+ {
+  "id": 399,
+  "source": "variety",
+  "text": "The university received a large donation to fund scholarships for first-year students."
+ },
+ {
+  "id": 400,
+  "source": "variety",
+  "text": "Health officials confirmed the first flu case of the season on Monday."
+ },
+ {
+  "id": 401,
+  "source": "variety",
+  "text": "The bridge, built in 1932, will undergo its first major inspection in a decade."
+ },
+ {
+  "id": 402,
+  "source": "variety",
+  "text": "The restaurant owner said the new location will open sometime this spring."
+ },
+ {
+  "id": 403,
+  "source": "variety",
+  "text": "A water main break disrupted service to several neighborhoods for most of the day."
+ },
+ {
+  "id": 404,
+  "source": "variety",
+  "text": "The airport added two new direct flights to cities on the west coast."
+ },
+ {
+  "id": 405,
+  "source": "variety",
+  "text": "Volunteers collected more than a thousand pounds of litter during the cleanup."
+ },
+ {
+  "id": 406,
+  "source": "variety",
+  "text": "The council will hold a public hearing on the proposal next Thursday evening."
+ },
+ {
+  "id": 407,
+  "source": "variety",
+  "text": "Temperatures are expected to climb into the nineties by the end of the week."
+ },
+ {
+  "id": 408,
+  "source": "variety",
+  "text": "The team celebrated its first championship in nearly thirty years."
+ },
+ {
+  "id": 409,
+  "source": "variety",
+  "text": "Local businesses reported strong sales during the holiday shopping season."
+ },
+ {
+  "id": 410,
+  "source": "variety",
+  "text": "The county sheriff said deputies responded to forty-two calls over the weekend."
+ },
+ {
+  "id": 411,
+  "source": "variety",
+  "text": "The new bike lane will connect downtown to the river trail by next summer."
+ },
+ {
+  "id": 412,
+  "source": "variety",
+  "text": "\"Did you water the plants?\" she asked before leaving."
+ },
+ {
+  "id": 413,
+  "source": "variety",
+  "text": "\"I forgot,\" he admitted, \"but I will do it now.\""
+ },
+ {
+  "id": 414,
+  "source": "variety",
+  "text": "\"They needed water two days ago,\" she said with a sigh."
+ },
+ {
+  "id": 415,
+  "source": "variety",
+  "text": "\"They still look fine to me,\" he said, shrugging."
+ },
+ {
+  "id": 416,
+  "source": "variety",
+  "text": "\"That is because they are plastic,\" she replied."
+ },
+ {
+  "id": 417,
+  "source": "variety",
+  "text": "\"Oh,\" he said, and they both started laughing."
+ },
+ {
+  "id": 418,
+  "source": "variety",
+  "text": "\"What should we do tonight?\" he asked on the drive home."
+ },
+ {
+  "id": 419,
+  "source": "variety",
+  "text": "\"Anything is fine,\" she said, \"as long as it is quiet.\""
+ },
+ {
+  "id": 420,
+  "source": "variety",
+  "text": "\"We could just stay in and watch a movie,\" he suggested."
+ },
+ {
+  "id": 421,
+  "source": "variety",
+  "text": "\"Perfect,\" she said, \"as long as you pick something good.\""
+ },
+ {
+  "id": 422,
+  "source": "variety",
+  "text": "\"No promises,\" he said, grinning as he pulled into the driveway."
+ },
+ {
+  "id": 423,
+  "source": "variety",
+  "text": "\"You always say that,\" she said, \"and you always pick a bad one.\""
+ },
+ {
+  "id": 424,
+  "source": "variety",
+  "text": "\"Not always,\" he protested, but he was smiling too."
+ },
+ {
+  "id": 425,
+  "source": "variety",
+  "text": "\"Fine,\" she said, \"I will pick tonight.\""
+ },
+ {
+  "id": 426,
+  "source": "variety",
+  "text": "\"Deal,\" he said, and they went inside together."
+ },
+ {
+  "id": 427,
+  "source": "variety",
+  "text": "\"How was your day?\" she asked as she set the table."
+ },
+ {
+  "id": 428,
+  "source": "variety",
+  "text": "\"Long,\" he said, \"but it is over now.\""
+ },
+ {
+  "id": 429,
+  "source": "variety",
+  "text": "\"That is all that matters,\" she said, handing him a plate."
+ },
+ {
+  "id": 430,
+  "source": "variety",
+  "text": "\"Thanks,\" he said, and for a while neither of them spoke."
+ },
+ {
+  "id": 431,
+  "source": "variety",
+  "text": "\"This is nice,\" she said finally, and he agreed."
+ },
+ {
+  "id": 432,
+  "source": "variety",
+  "text": "The survey included 11 participants from across the region."
+ },
+ {
+  "id": 433,
+  "source": "variety",
+  "text": "The survey included 94 participants from across the region."
+ },
+ {
+  "id": 434,
+  "source": "variety",
+  "text": "The survey included 63 participants from across the region."
+ },
+ {
+  "id": 435,
+  "source": "variety",
+  "text": "The survey included 9 participants from across the region."
+ },
+ {
+  "id": 436,
+  "source": "variety",
+  "text": "The survey included 98 participants from across the region."
+ },
+ {
+  "id": 437,
+  "source": "variety",
+  "text": "The survey included 69 participants from across the region."
+ },
+ {
+  "id": 438,
+  "source": "variety",
+  "text": "The survey included 99 participants from across the region."
+ },
+ {
+  "id": 439,
+  "source": "variety",
+  "text": "The survey included 17 participants from across the region."
+ },
+ {
+  "id": 440,
+  "source": "variety",
+  "text": "The building was constructed in 1984 and renovated twice since then."
+ },
+ {
+  "id": 441,
+  "source": "variety",
+  "text": "The building was constructed in 1960 and renovated twice since then."
+ },
+ {
+  "id": 442,
+  "source": "variety",
+  "text": "The building was constructed in 2021 and renovated twice since then."
+ },
+ {
+  "id": 443,
+  "source": "variety",
+  "text": "The building was constructed in 1970 and renovated twice since then."
+ },
+ {
+  "id": 444,
+  "source": "variety",
+  "text": "The building was constructed in 1921 and renovated twice since then."
+ },
+ {
+  "id": 445,
+  "source": "variety",
+  "text": "The building was constructed in 1933 and renovated twice since then."
+ },
+ {
+  "id": 446,
+  "source": "variety",
+  "text": "The building was constructed in 1967 and renovated twice since then."
+ },
+ {
+  "id": 447,
+  "source": "variety",
+  "text": "The building was constructed in 2011 and renovated twice since then."
+ },
+ {
+  "id": 448,
+  "source": "variety",
+  "text": "The building was constructed in 1977 and renovated twice since then."
+ },
+ {
+  "id": 449,
+  "source": "variety",
+  "text": "The building was constructed in 1954 and renovated twice since then."
+ },
+ {
+  "id": 450,
+  "source": "variety",
+  "text": "The shelf holds up to 494 pounds of equipment."
+ },
+ {
+  "id": 451,
+  "source": "variety",
+  "text": "The shelf holds up to 109 pounds of equipment."
+ },
+ {
+  "id": 452,
+  "source": "variety",
+  "text": "The shelf holds up to 476 pounds of equipment."
+ },
+ {
+  "id": 453,
+  "source": "variety",
+  "text": "The shelf holds up to 277 pounds of equipment."
+ },
+ {
+  "id": 454,
+  "source": "variety",
+  "text": "The shelf holds up to 387 pounds of equipment."
+ },
+ {
+  "id": 455,
+  "source": "variety",
+  "text": "The shelf holds up to 374 pounds of equipment."
+ },
+ {
+  "id": 456,
+  "source": "variety",
+  "text": "The shelf holds up to 354 pounds of equipment."
+ },
+ {
+  "id": 457,
+  "source": "variety",
+  "text": "The shelf holds up to 103 pounds of equipment."
+ },
+ {
+  "id": 458,
+  "source": "variety",
+  "text": "The shelf holds up to 366 pounds of equipment."
+ },
+ {
+  "id": 459,
+  "source": "variety",
+  "text": "The shelf holds up to 160 pounds of equipment."
+ },
+ {
+  "id": 460,
+  "source": "variety",
+  "text": "Please wait 26 seconds before restarting the machine."
+ },
+ {
+  "id": 461,
+  "source": "variety",
+  "text": "Please wait 43 seconds before restarting the machine."
+ },
+ {
+  "id": 462,
+  "source": "variety",
+  "text": "Please wait 42 seconds before restarting the machine."
+ },
+ {
+  "id": 463,
+  "source": "variety",
+  "text": "Please wait 24 seconds before restarting the machine."
+ },
+ {
+  "id": 464,
+  "source": "variety",
+  "text": "Please wait 29 seconds before restarting the machine."
+ },
+ {
+  "id": 465,
+  "source": "variety",
+  "text": "Please wait 58 seconds before restarting the machine."
+ },
+ {
+  "id": 466,
+  "source": "variety",
+  "text": "Please wait 34 seconds before restarting the machine."
+ },
+ {
+  "id": 467,
+  "source": "variety",
+  "text": "Please wait 8 seconds before restarting the machine."
+ },
+ {
+  "id": 468,
+  "source": "variety",
+  "text": "Please wait 16 seconds before restarting the machine."
+ },
+ {
+  "id": 469,
+  "source": "variety",
+  "text": "The event drew a crowd of about 231 people."
+ },
+ {
+  "id": 470,
+  "source": "variety",
+  "text": "The event drew a crowd of about 66 people."
+ },
+ {
+  "id": 471,
+  "source": "variety",
+  "text": "The event drew a crowd of about 347 people."
+ },
+ {
+  "id": 472,
+  "source": "variety",
+  "text": "The event drew a crowd of about 22 people."
+ },
+ {
+  "id": 473,
+  "source": "variety",
+  "text": "The event drew a crowd of about 603 people."
+ },
+ {
+  "id": 474,
+  "source": "variety",
+  "text": "The event drew a crowd of about 568 people."
+ },
+ {
+  "id": 475,
+  "source": "variety",
+  "text": "The event drew a crowd of about 236 people."
+ },
+ {
+  "id": 476,
+  "source": "variety",
+  "text": "The event drew a crowd of about 226 people."
+ },
+ {
+  "id": 477,
+  "source": "variety",
+  "text": "The event drew a crowd of about 8 people."
+ },
+ {
+  "id": 478,
+  "source": "variety",
+  "text": "The recipe serves 10 if you double the ingredients."
+ },
+ {
+  "id": 479,
+  "source": "variety",
+  "text": "The recipe serves 91 if you double the ingredients."
+ },
+ {
+  "id": 480,
+  "source": "variety",
+  "text": "The recipe serves 81 if you double the ingredients."
+ },
+ {
+  "id": 481,
+  "source": "variety",
+  "text": "The recipe serves 8 if you double the ingredients."
+ },
+ {
+  "id": 482,
+  "source": "variety",
+  "text": "The recipe serves 30 if you double the ingredients."
+ },
+ {
+  "id": 483,
+  "source": "variety",
+  "text": "The recipe serves 9 if you double the ingredients."
+ },
+ {
+  "id": 484,
+  "source": "variety",
+  "text": "The recipe serves 5 if you double the ingredients."
+ },
+ {
+  "id": 485,
+  "source": "variety",
+  "text": "The recipe serves 43 if you double the ingredients."
+ },
+ {
+  "id": 486,
+  "source": "variety",
+  "text": "The recipe serves 66 if you double the ingredients."
+ },
+ {
+  "id": 487,
+  "source": "variety",
+  "text": "The meeting was moved to room 4 on the second floor."
+ },
+ {
+  "id": 488,
+  "source": "variety",
+  "text": "The meeting was moved to room 5 on the second floor."
+ },
+ {
+  "id": 489,
+  "source": "variety",
+  "text": "The meeting was moved to room 11 on the second floor."
+ },
+ {
+  "id": 490,
+  "source": "variety",
+  "text": "The meeting was moved to room 8 on the second floor."
+ },
+ {
+  "id": 491,
+  "source": "variety",
+  "text": "The meeting was moved to room 9 on the second floor."
+ },
+ {
+  "id": 492,
+  "source": "variety",
+  "text": "The meeting was moved to room 3 on the second floor."
+ },
+ {
+  "id": 493,
+  "source": "variety",
+  "text": "The meeting was moved to room 12 on the second floor."
+ },
+ {
+  "id": 494,
+  "source": "variety",
+  "text": "The meeting was moved to room 10 on the second floor."
+ },
+ {
+  "id": 495,
+  "source": "variety",
+  "text": "The bus runs every 16 minutes during rush hour."
+ },
+ {
+  "id": 496,
+  "source": "variety",
+  "text": "The bus runs every 8 minutes during rush hour."
+ },
+ {
+  "id": 497,
+  "source": "variety",
+  "text": "The bus runs every 26 minutes during rush hour."
+ },
+ {
+  "id": 498,
+  "source": "variety",
+  "text": "The bus runs every 14 minutes during rush hour."
+ },
+ {
+  "id": 499,
+  "source": "variety",
+  "text": "The bus runs every 7 minutes during rush hour."
+ },
+ {
+  "id": 500,
+  "source": "variety",
+  "text": "The bus runs every 4 minutes during rush hour."
+ },
+ {
+  "id": 501,
+  "source": "variety",
+  "text": "The bus runs every 22 minutes during rush hour."
+ },
+ {
+  "id": 502,
+  "source": "variety",
+  "text": "The battery lasts about 56 hours on a single charge."
+ },
+ {
+  "id": 503,
+  "source": "variety",
+  "text": "The battery lasts about 46 hours on a single charge."
+ },
+ {
+  "id": 504,
+  "source": "variety",
+  "text": "The battery lasts about 55 hours on a single charge."
+ },
+ {
+  "id": 505,
+  "source": "variety",
+  "text": "The battery lasts about 53 hours on a single charge."
+ },
+ {
+  "id": 506,
+  "source": "variety",
+  "text": "The battery lasts about 60 hours on a single charge."
+ },
+ {
+  "id": 507,
+  "source": "variety",
+  "text": "The battery lasts about 94 hours on a single charge."
+ },
+ {
+  "id": 508,
+  "source": "variety",
+  "text": "The battery lasts about 7 hours on a single charge."
+ },
+ {
+  "id": 509,
+  "source": "variety",
+  "text": "The battery lasts about 87 hours on a single charge."
+ },
+ {
+  "id": 510,
+  "source": "variety",
+  "text": "The battery lasts about 84 hours on a single charge."
+ },
+ {
+  "id": 511,
+  "source": "variety",
+  "text": "The battery lasts about 83 hours on a single charge."
+ },
+ {
+  "id": 512,
+  "source": "variety",
+  "text": "The course meets 7 times over the semester."
+ },
+ {
+  "id": 513,
+  "source": "variety",
+  "text": "The course meets 4 times over the semester."
+ },
+ {
+  "id": 514,
+  "source": "variety",
+  "text": "The course meets 26 times over the semester."
+ },
+ {
+  "id": 515,
+  "source": "variety",
+  "text": "The course meets 47 times over the semester."
+ },
+ {
+  "id": 516,
+  "source": "variety",
+  "text": "The course meets 22 times over the semester."
+ },
+ {
+  "id": 517,
+  "source": "variety",
+  "text": "The course meets 16 times over the semester."
+ },
+ {
+  "id": 518,
+  "source": "variety",
+  "text": "The course meets 13 times over the semester."
+ },
+ {
+  "id": 519,
+  "source": "variety",
+  "text": "The course meets 35 times over the semester."
+ }
+]
