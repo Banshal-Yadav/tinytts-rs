@@ -9,6 +9,7 @@
 
 use crate::arpabet;
 use crate::lexicon;
+use crate::numbers;
 use crate::G2pResult;
 
 /// Token classes produced by `tokenize`.
@@ -38,51 +39,75 @@ fn is_punct(c: char) -> bool {
 }
 
 fn tokenize(text: &str) -> Vec<Tok> {
+    // Mirrors the reference TOKEN_RE:
+    //   [A-Za-z]+(?:'[A-Za-z]+)? | \d+(?:[.,]\d+)*(?:st|nd|rd|th)? |
+    //   [;:,.!?\u{2014}\u{2026}"\u{201c}\u{201d}()] | \S
+    let chars: Vec<char> = text.chars().collect();
     let mut out = Vec::new();
-    let mut chars = text.chars().peekable();
-    while let Some(&c) = chars.peek() {
-        if c.is_ascii_alphabetic() || c == '\'' && out.last().is_some() {
-            // word: letters plus internal apostrophes ("That's"). A leading
-            // quote ('Wait,') enters this branch with an empty word; the
-            // quote must be consumed here or the outer loop spins forever.
+    let mut i = 0;
+    while i < chars.len() {
+        let c = chars[i];
+        if c.is_ascii_alphabetic() {
             let mut w = String::new();
-            if c == '\'' {
-                chars.next();
+            while i < chars.len() && chars[i].is_ascii_alphabetic() {
+                w.push(chars[i]);
+                i += 1;
             }
-            while let Some(&c2) = chars.peek() {
-                if c2.is_ascii_alphabetic() || (c2 == '\'' && !w.is_empty()) {
-                    w.push(c2);
-                    chars.next();
+            // optional internal apostrophe group: (?:'[A-Za-z]+)?
+            if i < chars.len() && chars[i] == '\'' {
+                let mut j = i + 1;
+                let mut tail = String::new();
+                while j < chars.len() && chars[j].is_ascii_alphabetic() {
+                    tail.push(chars[j]);
+                    j += 1;
+                }
+                if !tail.is_empty() {
+                    w.push('\'');
+                    w.push_str(&tail);
+                    i = j;
+                }
+            }
+            out.push(Tok::Word(w));
+        } else if c.is_ascii_digit() {
+            let mut n = String::new();
+            while i < chars.len() && chars[i].is_ascii_digit() {
+                n.push(chars[i]);
+                i += 1;
+            }
+            // (?:[.,]\d+)*
+            loop {
+                if i + 1 < chars.len()
+                    && (chars[i] == '.' || chars[i] == ',')
+                    && chars[i + 1].is_ascii_digit()
+                {
+                    n.push(chars[i]);
+                    i += 1;
+                    while i < chars.len() && chars[i].is_ascii_digit() {
+                        n.push(chars[i]);
+                        i += 1;
+                    }
                 } else {
                     break;
                 }
             }
-            // trim a trailing lone apostrophe ("dogs'" -> "dogs")
-            while w.ends_with('\'') {
-                w.pop();
-            }
-            if !w.is_empty() {
-                out.push(Tok::Word(w));
-            }
-        } else if c.is_ascii_digit() {
-            let mut n = String::new();
-            while let Some(&c2) = chars.peek() {
-                if c2.is_ascii_digit() || c2 == ',' || c2 == '.' || c2 == ':' {
-                    n.push(c2);
-                    chars.next();
-                } else {
+            // (?:st|nd|rd|th)?
+            for suf in ["st", "nd", "rd", "th"] {
+                let sc: Vec<char> = suf.chars().collect();
+                if i + 2 <= chars.len() && chars[i..i + 2] == sc[..] {
+                    n.push_str(suf);
+                    i += 2;
                     break;
                 }
             }
             out.push(Tok::Number(n));
         } else if is_punct(c) {
-            chars.next();
             out.push(Tok::Punct(c));
+            i += 1;
         } else if c.is_whitespace() {
-            chars.next();
+            i += 1;
         } else {
-            chars.next();
             out.push(Tok::Other(c));
+            i += 1;
         }
     }
     out
@@ -137,11 +162,11 @@ fn cmu_lookup(word: &str) -> Option<String> {
         // -s: cats -> cat, boxes -> box (via -es), cities -> city
         if word.len() > 2 && word.ends_with('s') && !word.ends_with("ss") {
             let mut stems: Vec<String> = vec![word[..word.len() - 1].to_string()];
-            if word.ends_with("es") {
-                stems.push(word[..word.len() - 2].to_string());
+            if let Some(s) = word.strip_suffix("es") {
+                stems.push(s.to_string());
             }
-            if word.ends_with("ies") {
-                stems.push(format!("{}y", &word[..word.len() - 3]));
+            if let Some(s) = word.strip_suffix("ies") {
+                stems.push(format!("{}y", s));
             }
             for stem in &stems {
                 if let Some(p) = lexicon::lookup_cmu(stem) {
@@ -211,6 +236,14 @@ fn lexicon_lookup(word: &str) -> Option<&'static str> {
     })
 }
 
+/// Lexicon first, then CMU fallback. Used by the number-expansion path.
+fn word_phonemes_any(word: &str) -> Option<String> {
+    if let Some(ps) = lexicon_lookup(word) {
+        return Some(ps.to_string());
+    }
+    cmu_lookup(&word.to_lowercase())
+}
+
 // ---------------------------------------------------------------------------
 // Function-word context rules (word-level branch)
 // ---------------------------------------------------------------------------
@@ -245,8 +278,8 @@ fn spell_out(word: &str) -> Option<String> {
 
 /// Phonemes of the next word-ish token (for the/a sound checks).
 fn next_word_phonemes(idx: usize, toks: &[Tok]) -> Option<String> {
-    for j in idx + 1..(idx + 3).min(toks.len()) {
-        match &toks[j] {
+    for tok in toks.iter().take((idx + 3).min(toks.len())).skip(idx + 1) {
+        match tok {
             Tok::Punct(_) => continue,
             Tok::Other(c) if *c == '$' || *c == '-' || *c == '\u{2014}' => continue,
             Tok::Word(w) => {
@@ -285,6 +318,7 @@ pub fn g2p(text: &str) -> G2pResult {
     let mut sent_start = true;
 
     for (idx, tok) in toks.iter().enumerate() {
+        let nxt = toks.get(idx + 1);
         match tok {
             Tok::Punct(p) => {
                 if parts.is_empty() {
@@ -294,21 +328,92 @@ pub fn g2p(text: &str) -> G2pResult {
                 }
             }
             Tok::Number(n) => {
-                // number expansion is not ported yet; until then the digits
-                // are a reported gap, not a silent one.
-                oov.push(n.clone());
-                parts.push(n.clone());
+                // ordinal suffix: 26th -> twenty sixth
+                if let Some(ow) = numbers::ordinal_words(n) {
+                    let mut ok = true;
+                    for w in ow.split(' ') {
+                        match word_phonemes_any(w) {
+                            Some(ps) => parts.push(arpabet::flap_all(&ps)),
+                            None => {
+                                ok = false;
+                                break;
+                            }
+                        }
+                    }
+                    if !ok {
+                        oov.push(n.clone());
+                    }
+                    continue;
+                }
+                // currency prefix: $18 -> eighteen dollars
+                let cur = if matches!(toks.get(idx.wrapping_sub(1)), Some(Tok::Other('$'))) {
+                    Some("dollars")
+                } else {
+                    None
+                };
+                let words = match numbers::number_words(n) {
+                    Some(w) => w,
+                    None => {
+                        oov.push(n.clone());
+                        continue;
+                    }
+                };
+                let mut ok = true;
+                for w in &words {
+                    match word_phonemes_any(w) {
+                        Some(ps) => parts.push(arpabet::flap_all(&ps)),
+                        None => {
+                            ok = false;
+                            break;
+                        }
+                    }
+                }
+                if let Some(c) = cur {
+                    if ok {
+                        match word_phonemes_any(c) {
+                            Some(ps) => parts.push(ps),
+                            None => ok = false,
+                        }
+                    }
+                }
+                if !ok {
+                    oov.push(n.clone());
+                }
             }
-            Tok::Other(c) => match c {
-                // skipped outright (hyphen join, currency prefix handled
-                // with numbers, stray apostrophes)
-                '\'' | '-' | '$' => {}
-                // symbol words (reference SYMBOLS/ADD_SYMBOLS)
-                '@' => parts.push("ˈæt".to_string()),
-                '+' => parts.push("plˈʌs".to_string()),
-                '/' => parts.push("slˈæʃ".to_string()),
-                _ => parts.push(c.to_string()),
-            },
+            Tok::Other(c) => {
+                // negative number: '-' before a digit token -> minus
+                if *c == '-'
+                    && matches!(nxt, Some(Tok::Number(n2)) if n2.bytes().all(|b| b.is_ascii_digit()))
+                {
+                    parts.push("mˈInəs".to_string());
+                    continue;
+                }
+                match c {
+                    // skipped outright (hyphen join, currency prefix handled
+                    // with numbers, stray apostrophes)
+                    '\'' | '-' | '\u{2014}' | '$' => {}
+                    // date separator: '/' between two digit tokens is dropped
+                    // (12/3/1905 -> twelve three nineteen oh five)
+                    '/' if matches!(toks.get(idx.wrapping_sub(1)), Some(Tok::Number(p))
+                            if p.bytes().all(|b| b.is_ascii_digit()))
+                        && matches!(nxt, Some(Tok::Number(n2))
+                            if n2.bytes().all(|b| b.is_ascii_digit())) => {}
+                    // symbol words (reference SYMBOLS/ADD_SYMBOLS)
+                    '@' => parts.push("ˈæt".to_string()),
+                    '%' => parts.push("pəɹsˈɛnt".to_string()),
+                    '+' => parts.push("plˈʌs".to_string()),
+                    '/' => parts.push("slˈæʃ".to_string()),
+                    // any other non-space char is treated as a word: lexicon,
+                    // then CMU, then OOV (matches the reference fallthrough)
+                    _ => {
+                        let s = c.to_string();
+                        match word_phonemes_any(&s) {
+                            Some(ps) => parts.push(arpabet::flap_all(&ps)),
+                            None => oov.push(s),
+                        }
+                    }
+                }
+            }
             Tok::Word(w) => {
                 let low = w.to_lowercase();
                 // function-word context rules first (reference order)
@@ -470,9 +575,43 @@ mod tests {
     }
 
     #[test]
-    fn numbers_are_reported_as_gaps() {
+    fn numbers_expand() {
         let r = g2p("I have 3 cats.");
-        assert_eq!(r.oov, vec!["3".to_string()]);
+        assert!(r.oov.is_empty(), "{:?}", r.oov);
+        assert!(r.phonemes.contains("θɹˈi"), "{}", r.phonemes);
+    }
+
+    #[test]
+    fn known_findings() {
+        // 2019 -> "twenty nineteen" (not "twenty nine")
+        assert!(g2p("In 2019 we left.").phonemes.contains("twˈɛnti nˌIntˈin"));
+        // 40th -> "fortieth" (not "fortyth")
+        assert!(g2p("He came 40th.").phonemes.contains("fˈɔɹTiəθ"));
+        // 1,284.67 -> thousands + decimal
+        let r = g2p("It cost 1,284.67 dollars.");
+        assert!(r.oov.is_empty(), "{:?}", r.oov);
+        assert!(r.phonemes.contains("wˈʌn θˈWzᵊnd"), "{}", r.phonemes);
+        assert!(r.phonemes.contains("pˈYnt"), "{}", r.phonemes);
+        // percent sign maps to "percent" (misaki SYMBOLS)
+        let r = g2p("rose 8.3%");
+        assert!(r.oov.is_empty(), "{:?}", r.oov);
+        assert!(r.phonemes.contains("pəɹsˈɛnt"), "{}", r.phonemes);
+    }
+
+    #[test]
+    fn date_and_time() {
+        // 12/3/1905 -> twelve three nineteen oh five (slashes dropped)
+        let r = g2p("on 12/3/1905");
+        assert!(!r.phonemes.contains("slˈæʃ"), "{}", r.phonemes);
+        assert!(r.phonemes.contains("twˈɛlv θɹˈi"), "{}", r.phonemes);
+        // 9:30 -> nine thirty (colon glued)
+        assert!(g2p("at 9:30").phonemes.contains("nˈIn: θˈɜɹTi"));
+    }
+
+    #[test]
+    fn negative_and_currency() {
+        assert!(g2p("was -7 degrees").phonemes.contains("mˈInəs sˈɛvən"));
+        assert!(g2p("costs $18").phonemes.contains("ˌAtˈin dˈɑləɹz"));
     }
 
     #[test]

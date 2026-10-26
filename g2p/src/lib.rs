@@ -18,6 +18,7 @@
 
 pub mod arpabet;
 pub mod lexicon;
+pub mod numbers;
 pub mod rules;
 
 /// Result of converting one text to phonemes.

@@ -177,7 +177,7 @@ mod tests {
         // Every ARPAbet phone CMUdict can produce must be in MAP (except ER,
         // which has its own branch, and the vowel+digit combos).
         for (k, _) in MAP {
-            assert_eq!(k.len() >= 1 && k.chars().all(|c| c.is_ascii_uppercase()), true);
+            assert!(!k.is_empty() && k.chars().all(|c| c.is_ascii_uppercase()));
         }
         // spot checks against the frozen derived map
         assert_eq!(map_lookup(MAP, "AY"), Some("I"));
