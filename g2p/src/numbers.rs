@@ -52,24 +52,26 @@ pub fn num2words(n: u64) -> String {
     n.to_string()
 }
 
-/// proto3 year_words: 1000..=2099 read as a year.
+/// Year reading, matching misaki (num2words to='year', "and"/hyphens
+/// stripped): 1000 -> one thousand, 1001 -> one thousand one, 1010 -> ten ten,
+/// 1100 -> eleven hundred, 1905 -> nineteen oh five, 2100 -> twenty one
+/// hundred, 2101 -> twenty one oh one, 3000 -> three thousand.
 pub fn year_words(n: u64) -> String {
-    if (1000..=2099).contains(&n) {
+    if (1000..=9999).contains(&n) {
+        if n.is_multiple_of(1000) {
+            return num2words(n);
+        }
+        if n.is_multiple_of(100) {
+            return format!("{} hundred", num2words(n / 100));
+        }
+        if n % 1000 < 10 {
+            return format!("{} {}", num2words(n - n % 100), num2words(n % 100));
+        }
         let h = n / 100;
         let r = n % 100;
-        if r == 0 {
-            return format!("{} hundred", num2words(h));
-        }
-        if n < 2000 {
-            if r < 10 {
-                return format!("{} oh {}", num2words(h), num2words(r));
-            }
-            return format!("{} {}", num2words(h), num2words(r));
-        }
         if r < 10 {
             return format!("{} oh {}", num2words(h), num2words(r));
         }
-        // 2050 -> "twenty fifty", 2019 -> "twenty nineteen"
         return format!("{} {}", num2words(h), num2words(r));
     }
     num2words(n)
@@ -101,15 +103,16 @@ pub fn number_words(word: &str) -> Option<Vec<String>> {
         words.extend(year_words(slash[2].parse().ok()?).split(' ').map(String::from));
         return Some(words);
     }
-    // year: 4 digits in 1000..=2099
+    // year: 4 digits in 1000..=9999
     if word.len() == 4 && is_digits(word) {
         let n: u64 = word.parse().ok()?;
-        if (1000..=2099).contains(&n) {
+        if (1000..=9999).contains(&n) {
             return Some(year_words(n).split(' ').map(String::from).collect());
         }
     }
     // thousands and/or decimal: "1,284.67" -> one thousand two hundred
-    // eighty four point six seven; "42.50" -> forty two point five zero
+    // eighty four point six seven; "42.50" -> forty two point five
+    // (trailing zeros in the fraction are dropped, like num2words)
     if (word.contains(',') || word.contains('.')) && is_thousands_decimal(word) {
         let (whole, frac) = match word.split_once('.') {
             Some((w, f)) => (w, Some(f)),
@@ -122,9 +125,12 @@ pub fn number_words(word: &str) -> Option<Vec<String>> {
             num2words(whole_clean.parse().ok()?).split(' ').map(String::from).collect()
         };
         if let Some(f) = frac {
-            words.push("point".to_string());
-            for c in f.chars() {
-                words.push(ONES[c.to_digit(10)? as usize].to_string());
+            let f = f.trim_end_matches('0');
+            if !f.is_empty() {
+                words.push("point".to_string());
+                for c in f.chars() {
+                    words.push(ONES[c.to_digit(10)? as usize].to_string());
+                }
             }
         }
         return Some(words);
@@ -165,49 +171,76 @@ fn is_thousands(word: &str) -> bool {
     parts[1..].iter().all(|p| p.len() == 3 && is_digits(p))
 }
 
-/// proto3 ordinal_words: 26th -> twenty sixth, 8th -> eighth, 2nd -> second.
+const ORDINAL_ONES: [&str; 20] = [
+    "zeroth", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth",
+    "ninth", "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth",
+    "sixteenth", "seventeenth", "eighteenth", "nineteenth",
+];
+const ORDINAL_TENS: [&str; 10] = [
+    "", "", "twentieth", "thirtieth", "fortieth", "fiftieth", "sixtieth", "seventieth",
+    "eightieth", "ninetieth",
+];
+
+/// num2words(n, to='ordinal') with hyphens/and stripped, matching misaki.
+pub fn ordinal_num(n: u64) -> String {
+    if n < 20 {
+        return ORDINAL_ONES[n as usize].to_string();
+    }
+    if n < 100 {
+        if n.is_multiple_of(10) {
+            return ORDINAL_TENS[(n / 10) as usize].to_string();
+        }
+        return format!("{} {}", TENS[(n / 10) as usize], ORDINAL_ONES[(n % 10) as usize]);
+    }
+    if n < 1000 {
+        if n.is_multiple_of(100) {
+            return format!("{} hundredth", ONES[(n / 100) as usize]);
+        }
+        return format!("{} hundred {}", ONES[(n / 100) as usize], ordinal_num(n % 100));
+    }
+    if n < 1_000_000 {
+        if n.is_multiple_of(1000) {
+            return format!("{} thousandth", num2words(n / 1000));
+        }
+        return format!("{} thousand {}", num2words(n / 1000), ordinal_num(n % 1000));
+    }
+    format!("{}th", num2words(n))
+}
+
+/// proto3 ordinal_words: 26th -> twenty sixth, 8th -> eighth, 2nd -> second, 12th -> twelfth.
 pub fn ordinal_words(word: &str) -> Option<String> {
-    let (num, suffix) = split_ordinal(word)?;
+    let (num, _) = split_ordinal(word)?;
     let n: u64 = num.parse().ok()?;
-    let irreg = |k: u64| -> Option<&'static str> {
-        match k {
-            1 => Some("first"),
-            2 => Some("second"),
-            3 => Some("third"),
-            5 => Some("fifth"),
-            8 => Some("eighth"),
-            9 => Some("ninth"),
-            12 => Some("twelfth"),
-            _ => None,
-        }
+    Some(ordinal_num(n))
+}
+
+/// misaki currency: $4.7 -> four dollars and seven cents;
+/// $0.99 -> ninety nine cents; $18 -> eighteen dollars.
+pub fn currency_words(word: &str) -> Vec<String> {
+    let clean = word.replace(',', "");
+    let (whole, frac) = match clean.split_once('.') {
+        Some((w, f)) => (w, f),
+        None => (clean.as_str(), ""),
     };
-    if matches!(n % 100, 11..=13) {
-        return Some(format!("{}th", num2words(n)));
+    let whole_n: u64 = whole.parse().unwrap_or(0);
+    let frac_n: u64 = frac.parse().unwrap_or(0);
+    let mut words = Vec::new();
+    if whole_n > 0 {
+        words.extend(num2words(whole_n).split(' ').map(String::from));
+        words.push("dollars".to_string());
     }
-    if n < 10 {
-        if let Some(w) = irreg(n % 10) {
-            return Some(w.to_string());
+    if frac_n > 0 {
+        if !words.is_empty() {
+            words.push("and".to_string());
         }
+        words.extend(num2words(frac_n).split(' ').map(String::from));
+        words.push("cents".to_string());
     }
-    if n > 20 {
-        if let Some(w) = irreg(n % 10) {
-            return Some(format!("{} {}", num2words(n - n % 10), w));
-        }
+    if words.is_empty() {
+        words.push("zero".to_string());
+        words.push("dollars".to_string());
     }
-    let suf = match n % 10 {
-        1 => "st",
-        2 => "nd",
-        3 => "rd",
-        _ => "th",
-    };
-    let _ = suffix;
-    // 40 -> forty + th = fortieth (drop the y)
-    let mut base = num2words(n);
-    if base.ends_with('y') {
-        base.pop();
-        base.push_str("ie");
-    }
-    Some(format!("{}{}", base, suf))
+    words
 }
 
 /// Split "26th" into ("26", "th"); None if not `<digits><st|nd|rd|th>`.
@@ -239,10 +272,15 @@ mod tests {
 
     #[test]
     fn years() {
-        assert_eq!(year_words(2019), "twenty nineteen");
+        assert_eq!(year_words(1000), "one thousand");
+        assert_eq!(year_words(1001), "one thousand one");
         assert_eq!(year_words(1905), "nineteen oh five");
-        assert_eq!(year_words(2000), "twenty hundred");
+        assert_eq!(year_words(2000), "two thousand");
+        assert_eq!(year_words(2005), "two thousand five");
+        assert_eq!(year_words(2010), "twenty ten");
+        assert_eq!(year_words(2019), "twenty nineteen");
         assert_eq!(year_words(2050), "twenty fifty");
+        assert_eq!(year_words(2100), "twenty one hundred");
         assert_eq!(year_words(1945), "nineteen forty five");
     }
 
@@ -251,15 +289,25 @@ mod tests {
         assert_eq!(ordinal_words("26th"), Some("twenty sixth".to_string()));
         assert_eq!(ordinal_words("8th"), Some("eighth".to_string()));
         assert_eq!(ordinal_words("2nd"), Some("second".to_string()));
+        assert_eq!(ordinal_words("12th"), Some("twelfth".to_string()));
         assert_eq!(ordinal_words("40th"), Some("fortieth".to_string()));
         assert_eq!(ordinal_words("13th"), Some("thirteenth".to_string()));
+        assert_eq!(ordinal_words("100th"), Some("one hundredth".to_string()));
     }
 
     #[test]
     fn decimals_and_thousands() {
         assert_eq!(
             number_words("42.50"),
-            Some("forty two point five zero".split(' ').map(String::from).collect())
+            Some("forty two point five".split(' ').map(String::from).collect())
+        );
+        assert_eq!(
+            number_words("4.0"),
+            Some("four".split(' ').map(String::from).collect())
+        );
+        assert_eq!(
+            number_words("100.00"),
+            Some("one hundred".split(' ').map(String::from).collect())
         );
         assert_eq!(
             number_words("1,284.67"),
@@ -268,6 +316,22 @@ mod tests {
         assert_eq!(
             number_words("1,284"),
             Some("one thousand two hundred eighty four".split(' ').map(String::from).collect())
+        );
+    }
+
+    #[test]
+    fn currency() {
+        assert_eq!(
+            currency_words("18"),
+            vec!["eighteen", "dollars"]
+        );
+        assert_eq!(
+            currency_words("4.7"),
+            vec!["four", "dollars", "and", "seven", "cents"]
+        );
+        assert_eq!(
+            currency_words("0.99"),
+            vec!["ninety", "nine", "cents"]
         );
     }
 

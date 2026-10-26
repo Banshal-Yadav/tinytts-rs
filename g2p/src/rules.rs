@@ -244,6 +244,16 @@ fn word_phonemes_any(word: &str) -> Option<String> {
     cmu_lookup(&word.to_lowercase())
 }
 
+/// Phonemes for one word of a number expansion. misaki looks up "point" with
+/// stress -2 (all stress marks stripped).
+fn word_phonemes_num(word: &str) -> Option<String> {
+    let mut ps = word_phonemes_any(word)?;
+    if word == "point" {
+        ps = ps.replace(['ˈ', 'ˌ'], "");
+    }
+    Some(ps)
+}
+
 // ---------------------------------------------------------------------------
 // Function-word context rules (word-level branch)
 // ---------------------------------------------------------------------------
@@ -345,12 +355,25 @@ pub fn g2p(text: &str) -> G2pResult {
                     }
                     continue;
                 }
-                // currency prefix: $18 -> eighteen dollars
-                let cur = if matches!(toks.get(idx.wrapping_sub(1)), Some(Tok::Other('$'))) {
-                    Some("dollars")
-                } else {
-                    None
-                };
+                // currency prefix: $18 -> eighteen dollars, $4.7 -> four dollars
+                // and seven cents, $0.99 -> ninety nine cents
+                if matches!(toks.get(idx.wrapping_sub(1)), Some(Tok::Other('$'))) {
+                    let words = numbers::currency_words(n);
+                    let mut ok = true;
+                    for w in &words {
+                        match word_phonemes_num(w) {
+                            Some(ps) => parts.push(arpabet::flap_all(&ps)),
+                            None => {
+                                ok = false;
+                                break;
+                            }
+                        }
+                    }
+                    if !ok {
+                        oov.push(n.clone());
+                    }
+                    continue;
+                }
                 let words = match numbers::number_words(n) {
                     Some(w) => w,
                     None => {
@@ -360,19 +383,11 @@ pub fn g2p(text: &str) -> G2pResult {
                 };
                 let mut ok = true;
                 for w in &words {
-                    match word_phonemes_any(w) {
+                    match word_phonemes_num(w) {
                         Some(ps) => parts.push(arpabet::flap_all(&ps)),
                         None => {
                             ok = false;
                             break;
-                        }
-                    }
-                }
-                if let Some(c) = cur {
-                    if ok {
-                        match word_phonemes_any(c) {
-                            Some(ps) => parts.push(ps),
-                            None => ok = false,
                         }
                     }
                 }
@@ -383,7 +398,7 @@ pub fn g2p(text: &str) -> G2pResult {
             Tok::Other(c) => {
                 // negative number: '-' before a digit token -> minus
                 if *c == '-'
-                    && matches!(nxt, Some(Tok::Number(n2)) if n2.bytes().all(|b| b.is_ascii_digit()))
+                    && matches!(nxt, Some(Tok::Number(n2)) if n2.chars().next().map(|c| c.is_ascii_digit()).unwrap_or(false))
                 {
                     parts.push("mˈInəs".to_string());
                     continue;
@@ -587,11 +602,11 @@ mod tests {
         assert!(g2p("In 2019 we left.").phonemes.contains("twˈɛnti nˌIntˈin"));
         // 40th -> "fortieth" (not "fortyth")
         assert!(g2p("He came 40th.").phonemes.contains("fˈɔɹTiəθ"));
-        // 1,284.67 -> thousands + decimal
+        // 1,284.67 -> thousands + decimal (point is unstressed like misaki)
         let r = g2p("It cost 1,284.67 dollars.");
         assert!(r.oov.is_empty(), "{:?}", r.oov);
         assert!(r.phonemes.contains("wˈʌn θˈWzᵊnd"), "{}", r.phonemes);
-        assert!(r.phonemes.contains("pˈYnt"), "{}", r.phonemes);
+        assert!(r.phonemes.contains("pYnt"), "{}", r.phonemes);
         // percent sign maps to "percent" (misaki SYMBOLS)
         let r = g2p("rose 8.3%");
         assert!(r.oov.is_empty(), "{:?}", r.oov);
@@ -611,7 +626,23 @@ mod tests {
     #[test]
     fn negative_and_currency() {
         assert!(g2p("was -7 degrees").phonemes.contains("mˈInəs sˈɛvən"));
+        assert!(g2p("was -1,000 degrees").phonemes.contains("mˈInəs wˈʌn θˈWzᵊnd"));
         assert!(g2p("costs $18").phonemes.contains("ˌAtˈin dˈɑləɹz"));
+        assert!(g2p("costs $4.7").phonemes.contains("fˈɔɹ dˈɑləɹz ænd sˈɛvən sˈɛnts"));
+        assert!(g2p("costs $0.99").phonemes.contains("nˈIndi nˈIn sˈɛnts"));
+    }
+
+    #[test]
+    fn ordinals_and_years() {
+        assert!(g2p("finished 12th").phonemes.contains("twˈɛlfθ"));
+        assert!(g2p("in 1000").phonemes.contains("wˈʌn θˈWzᵊnd"));
+        assert!(g2p("in 1001").phonemes.contains("wˈʌn θˈWzᵊnd wˈʌn"));
+        assert!(g2p("in 2000").phonemes.contains("tˈu θˈWzᵊnd"));
+        assert!(g2p("in 2005").phonemes.contains("tˈu θˈWzᵊnd fˈIv"));
+        assert!(g2p("in 2100").phonemes.contains("twˈɛnti wˈʌn hˈʌndɹəd"));
+        assert!(g2p("42.50").phonemes.contains("fˈɔɹTi tˈu pYnt fˈIv"));
+        assert_eq!(g2p("4.0").phonemes, "fˈɔɹ");
+        assert_eq!(g2p("100.00").phonemes, "wˈʌn hˈʌndɹəd");
     }
 
     #[test]

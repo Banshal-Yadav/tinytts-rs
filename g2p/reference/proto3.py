@@ -209,19 +209,48 @@ def num2words(n):
     return str(n)
 
 def year_words(n):
-    if 1000 <= n <= 2099:
+    # misaki (num2words to='year', with "and"/hyphens stripped):
+    #   1000 -> one thousand, 1001 -> one thousand one, 1010 -> ten ten
+    #   1100 -> eleven hundred, 1905 -> nineteen oh five
+    #   2000 -> two thousand, 2001 -> two thousand one, 2010 -> twenty ten
+    #   2100 -> twenty one hundred, 2101 -> twenty one oh one
+    #   3000 -> three thousand, 9999 -> ninety nine ninety nine
+    if 1000 <= n <= 9999:
+        if n % 1000 == 0:
+            return num2words(n)
+        if n % 100 == 0:
+            return num2words(n // 100) + ' hundred'
+        if n % 1000 < 10:
+            return num2words(n - n % 100) + ' ' + num2words(n % 100)
         h, r = divmod(n, 100)
-        if r == 0:
-            return num2words(h) + ' hundred'
-        if n < 2000:
-            if r < 10:
-                return num2words(h) + ' oh ' + num2words(r)
-            return num2words(h) + ' ' + num2words(r)
         if r < 10:
             return num2words(h) + ' oh ' + num2words(r)
-        # 2050 -> "twenty fifty", 2019 -> "twenty nineteen"
         return num2words(h) + ' ' + num2words(r)
     return num2words(n)
+
+def currency_words(word):
+    """misaki currency: $4.7 -> four dollars and seven cents;
+    $0.99 -> ninety nine cents; $18 -> eighteen dollars."""
+    word = word.replace(',', '')
+    if '.' in word:
+        whole, frac = word.split('.', 1)
+    else:
+        whole, frac = word, ''
+    words = []
+    whole_n = int(whole) if whole else 0
+    frac_n = int(frac) if frac else 0
+    if whole_n:
+        words.extend(num2words(whole_n).split())
+        words.append('dollars')
+    if frac_n:
+        if words:
+            words.append('and')
+        words.extend(num2words(frac_n).split())
+        words.append('cents')
+    if not words:
+        words = ['zero', 'dollars']
+    return words
+
 
 def number_words(word):
     if re.fullmatch(r'\d+:\d+', word):
@@ -240,11 +269,12 @@ def number_words(word):
         words.extend(num2words(int(d_)).split())
         words.extend(year_words(int(y_)).split())
         return words
-    if re.fullmatch(r'\d{4}', word) and 1000 <= int(word) <= 2099:
+    if re.fullmatch(r'\d{4}', word) and 1000 <= int(word) <= 9999:
         return year_words(int(word)).split()
     if re.fullmatch(r'\d+(,\d{3})*(\.\d+)?', word) and (',' in word or '.' in word):
         # thousands and/or decimal: "1,284.67" -> one thousand two hundred
-        # eighty four point six seven; "42.50" -> forty two point five zero
+        # eighty four point six seven; "42.50" -> forty two point five
+        # (trailing zeros in the fraction are dropped, like num2words)
         if '.' in word:
             whole, frac = word.split('.', 1)
         else:
@@ -252,9 +282,11 @@ def number_words(word):
         whole = whole.replace(',', '')
         words = num2words(int(whole)).split() if whole else []
         if frac is not None:
-            words.append('point')
-            for c in frac:
-                words.append(ONES[int(c)])
+            frac = frac.rstrip('0')
+            if frac:
+                words.append('point')
+                for c in frac:
+                    words.append(ONES[int(c)])
         return words
     if re.fullmatch(r'\d+(,\d{3})*', word):
         return num2words(int(word.replace(',', ''))).split()
@@ -263,25 +295,39 @@ def number_words(word):
     return None
 
 
+ORDINAL_ONES = ['zeroth', 'first', 'second', 'third', 'fourth', 'fifth',
+                'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh',
+                'twelfth', 'thirteenth', 'fourteenth', 'fifteenth',
+                'sixteenth', 'seventeenth', 'eighteenth', 'nineteenth']
+ORDINAL_TENS = ['', '', 'twentieth', 'thirtieth', 'fortieth', 'fiftieth',
+                'sixtieth', 'seventieth', 'eightieth', 'ninetieth']
+
+
+def ordinal_num(n):
+    """num2words(n, to='ordinal') with hyphens/and stripped, as misaki does."""
+    if n < 20:
+        return ORDINAL_ONES[n]
+    if n < 100:
+        if n % 10 == 0:
+            return ORDINAL_TENS[n // 10]
+        return TENS[n // 10] + ' ' + ORDINAL_ONES[n % 10]
+    if n < 1000:
+        if n % 100 == 0:
+            return ONES[n // 100] + ' hundredth'
+        return ONES[n // 100] + ' hundred ' + ordinal_num(n % 100)
+    if n < 1000000:
+        if n % 1000 == 0:
+            return num2words(n // 1000) + ' thousandth'
+        return num2words(n // 1000) + ' thousand ' + ordinal_num(n % 1000)
+    return num2words(n) + 'th'
+
+
 def ordinal_words(word):
-    """26th -> twenty sixth, 8th -> eighth, 2nd -> second, 40th -> fortieth"""
+    """26th -> twenty sixth, 8th -> eighth, 2nd -> second, 12th -> twelfth"""
     m = re.fullmatch(r'(\d+)(st|nd|rd|th)', word)
     if not m:
         return None
-    n = int(m.group(1))
-    IRREG = {1: 'first', 2: 'second', 3: 'third', 5: 'fifth', 8: 'eighth',
-             9: 'ninth', 12: 'twelfth'}
-    if n % 100 in (11, 12, 13):
-        return num2words(n) + 'th'
-    if n % 10 in IRREG and n < 10:
-        return IRREG[n]
-    if n % 10 in IRREG and n > 20:
-        return num2words(n - n % 10) + ' ' + IRREG[n % 10]
-    # 40 -> forty + th = fortieth (drop the y)
-    base = num2words(n)
-    if base.endswith('y'):
-        base = base[:-1] + 'ie'
-    return base + {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')
+    return ordinal_num(int(m.group(1)))
 
 TOKEN_RE = re.compile(r"[A-Za-z]+(?:'[A-Za-z]+)?|\d+(?:[.,]\d+)*(?:st|nd|rd|th)?|[;:,.!?—…\"“”()]|\S")
 PUNCT = set(';:,.!?—…“”()')
@@ -330,6 +376,19 @@ def next_word_phonemes(idx, tokens):
         return ps
     return None
 
+def num_word_phonemes(w):
+    """Phonemes for one word of a number expansion. misaki looks up "point"
+    with stress -2 (all stress marks stripped)."""
+    ps = lexicon_lookup(w)
+    if ps is None:
+        ps = cmu_lookup(w)
+    if ps is None:
+        return None
+    if w == 'point':
+        ps = ps.replace('ˈ', '').replace('ˌ', '')
+    return ps
+
+
 def g2p(text):
     text = text.lstrip('\ufeff')
     tokens = TOKEN_RE.findall(text)
@@ -347,8 +406,8 @@ def g2p(text):
             else:
                 out.append((tok, True))
             continue
-        if tok == '-' and idx + 1 < len(tokens) and re.fullmatch(r'\d+', tokens[idx + 1]):
-            # negative number: -7 -> minus seven
+        if tok == '-' and idx + 1 < len(tokens) and re.fullmatch(r'\d+(,\d{3})*(\.\d+)?', tokens[idx + 1]):
+            # negative number: -7 -> minus seven, -1,000 -> minus one thousand
             out.append(('mˈInəs', True))
             continue
         if tok == '-' or tok == '—':
@@ -410,31 +469,31 @@ def g2p(text):
                     if not ok:
                         oov.append(tok)
                     continue
-            # currency prefix: $18 -> eighteen dollars
-            cur = None
+            # currency prefix: $18 -> eighteen dollars, $4.7 -> four dollars
+            # and seven cents, $0.99 -> ninety nine cents
             if prev_tok == '$':
-                cur = 'dollars'
+                words = currency_words(tok)
+                ok = True
+                for w in words:
+                    ps = num_word_phonemes(w)
+                    if ps is None:
+                        ok = False
+                        break
+                    out.append((flap_all(ps), True))
+                if not ok:
+                    oov.append(tok)
+                continue
             words = number_words(tok)
             if words is None:
                 oov.append(tok)
                 continue
             ok = True
             for w in words:
-                ps = lexicon_lookup(w)
-                if ps is None:
-                    ps = cmu_lookup(w)
+                ps = num_word_phonemes(w)
                 if ps is None:
                     ok = False
                     break
                 out.append((flap_all(ps), True))
-            if cur and ok:
-                ps = lexicon_lookup(cur)
-                if ps is None:
-                    ps = cmu_lookup(cur)
-                if ps is None:
-                    ok = False
-                else:
-                    out.append((ps, True))
             if not ok:
                 oov.append(tok)
             continue

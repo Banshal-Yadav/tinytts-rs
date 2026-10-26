@@ -47,6 +47,13 @@ for w in ["-7", "-42", "-1,000"]:
 
 MISAKI_UNHANDLED = "\u2753"  # ❓
 
+# Intentional divergences (documented in g2p/DIVERGENCES.md): we keep the
+# better behaviour instead of copying misaki.
+INTENTIONAL = {
+    "-7", "-42", "-1,000",  # bare negatives: we say "minus seven"
+    "9:30", "6:45", "12:00", "3:05", "11:59", "7:22", "2:25", "6:07",  # H:MM
+}
+
 disagreements = []
 for t in inputs:
     pp, _ = proto3.g2p(t)
@@ -59,14 +66,23 @@ print(f"sweep inputs: {len(inputs)}")
 print(f"disagreements (proto3 vs misaki): {len(disagreements)}\n")
 
 for t, pp, mp in disagreements:
-    verdict = "misaki limitation" if MISAKI_UNHANDLED in mp else "proto3 bug"
+    if t in INTENTIONAL:
+        verdict = "intentional divergence"
+    elif MISAKI_UNHANDLED in mp:
+        verdict = "misaki limitation"
+    else:
+        verdict = "proto3 bug"
     print(f"input: {t!r}")
     print(f"  proto3: {pp!r}")
     print(f"  misaki: {mp!r}")
     print(f"  verdict: {verdict}")
     print()
 
-bugs = sum(1 for _, _, mp in disagreements if MISAKI_UNHANDLED not in mp)
-lims = len(disagreements) - bugs
+bugs = sum(1 for t, _, mp in disagreements
+           if t not in INTENTIONAL and MISAKI_UNHANDLED not in mp)
+lims = sum(1 for t, _, mp in disagreements
+           if t not in INTENTIONAL and MISAKI_UNHANDLED in mp)
+intent = sum(1 for t, _, _ in disagreements if t in INTENTIONAL)
 print(f"proto3 bugs: {bugs}")
 print(f"misaki limitations: {lims}")
+print(f"intentional divergences: {intent}")
