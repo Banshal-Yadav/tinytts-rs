@@ -18,7 +18,14 @@ path = "src/lib.rs"
 name = "tinytts"
 path = "src/main.rs"
 
+[[bin]]
+name = "tinytts-live"
+path = "src/live.rs"
+
 [dependencies]
+cpal = { version = "0.15", features = ["jack"] }
+tinytts-g2p = { path = "../g2p" }
+winapi = { version = "0.3", features = ["psapi", "processthreadsapi"] }
 
 [profile.release]
 opt-level = 3
