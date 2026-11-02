@@ -90,6 +90,48 @@ g2p/target/release/g2p.exe "Hello there."
 The `tinytts_g2p` crate exposes a public API:
 
 ```rust
+fn g2p(text: &str) -> G2pResult;
+fn g2p_ids(text: &str) -> (Vec<i64>, Vec<String>);
+```
+
+## Live Streaming TTS (`tinytts-live`)
+
+A separate binary that loads model + G2P once, reads stdin line-by-line, and streams audio directly to speakers — no files, no external players.
+
+```bash
+cd runtime
+cargo build --release --bin tinytts-live
+./target/release/tinytts-live.exe ../paradee_int8.onnx
+```
+
+Type sentences, press Enter, hear audio immediately. Ctrl+C to quit.
+
+**Features:**
+- Model + G2P loaded once at startup (~12 ms)
+- Chunks at sentence/comma boundaries (~80 tokens max)
+- Overlapped synthesis + playback via lock-free ring buffer
+- Auto-resamples 24 kHz → device rate, mono → stereo interleave
+- 10 ms crossfade between chunks (no clicks)
+- Per-line metrics: first-audio latency, synth time, RTF, RSS
+
+**Example session:**
+```
+[live] model loaded in 12.3 ms
+[live] warm-up done
+[live] ready. Type sentences and press Enter. Ctrl+C to quit.
+
+> Hello world.
+[live] line 1: first audio at 147 ms (chunk 1/1)
+[live] line 1 done: g2p=4.8ms synth=147ms audio=1.43s RTF=9.7x rss=54MB peak=64MB
+
+> This is a longer sentence. It gets split into chunks.
+[live] line 2: first audio at 2.9 s (chunk 1/2)
+[live] line 2 done: g2p=6.5ms synth=565ms audio=7.18s RTF=12.7x rss=56MB peak=81MB
+```
+
+See [`LIVE.md`](LIVE.md) for full documentation, options, and architecture.
+
+The core `tinytts` binary remains **542 KB, zero dependencies**. `tinytts-live` is a separate binary that adds `cpal` + `winapi` + `tinytts-g2p` for the streaming CLI use case.
 use tinytts_g2p::g2p_ids;
 let ids = g2p_ids("The quick brown fox jumps over the lazy dog.");
 // Returns Vec<i64> of token IDs wrapped in BOS/EOS (0)
