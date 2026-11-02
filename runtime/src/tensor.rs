@@ -10,23 +10,15 @@ use std::sync::Arc;
 /// every dtype the graph uses.
 pub fn align_bytes(src: &[u8]) -> Vec<u8> {
     let n = src.len();
-    let mut w: Vec<u64> = Vec::with_capacity(n.div_ceil(8).max(1));
-    let mut i = 0;
-    while i + 8 <= n {
-        w.push(u64::from_le_bytes(src[i..i + 8].try_into().unwrap()));
-        i += 8;
+    let cap_u64 = n.div_ceil(8).max(1);
+    let mut w: Vec<u64> = vec![0u64; cap_u64];
+    unsafe {
+        std::ptr::copy_nonoverlapping(src.as_ptr(), w.as_mut_ptr() as *mut u8, n);
+        let ptr = w.as_mut_ptr() as *mut u8;
+        let cap = w.capacity() * 8;
+        std::mem::forget(w);
+        Vec::from_raw_parts(ptr, n, cap)
     }
-    if i < n {
-        let mut tail = [0u8; 8];
-        tail[..n - i].copy_from_slice(&src[i..]);
-        w.push(u64::from_le_bytes(tail));
-    }
-    let mut out = Vec::with_capacity((w.len() * 8).max(8));
-    for x in w {
-        out.extend_from_slice(&x.to_le_bytes());
-    }
-    out.truncate(n);
-    out
 }
 
 /// A zeroed buffer with the same 8-byte alignment guarantee as `align_bytes`.
@@ -35,10 +27,14 @@ pub fn align_bytes(src: &[u8]) -> Vec<u8> {
 /// the `from_raw_parts` precondition when the buffer is viewed as `i64`. Keep
 /// the allocation at least one `u64` wide so the pointer stays 8-aligned.
 fn zero_bytes(n: usize) -> Vec<u8> {
-    let cap = n.div_ceil(8).max(1) * 8;
-    let mut out = vec![0u8; cap];
-    out.truncate(n);
-    out
+    let cap_u64 = n.div_ceil(8).max(1);
+    let mut w: Vec<u64> = vec![0u64; cap_u64];
+    unsafe {
+        let ptr = w.as_mut_ptr() as *mut u8;
+        let cap = w.capacity() * 8;
+        std::mem::forget(w);
+        Vec::from_raw_parts(ptr, n, cap)
+    }
 }
 
 /// A tensor. `d` is refcounted so that views (`Reshape`, `Squeeze`, `Unsqueeze`,
@@ -89,10 +85,11 @@ impl T {
         }
     }
     pub fn from_bool(dims: Vec<usize>, v: Vec<bool>) -> T {
+        let bytes: Vec<u8> = v.iter().map(|&b| b as u8).collect();
         T {
             dt: Dt::Bool,
             dims,
-            d: Arc::new(v.iter().map(|&b| b as u8).collect()),
+            d: Arc::new(align_bytes(&bytes)),
         }
     }
     #[inline]
@@ -105,7 +102,10 @@ impl T {
     }
     #[inline]
     pub fn fm(&mut self) -> &mut [f32] {
-        let d = Arc::make_mut(&mut self.d);
+        if Arc::get_mut(&mut self.d).is_none() {
+            self.d = Arc::new(align_bytes(&self.d));
+        }
+        let d = Arc::get_mut(&mut self.d).unwrap();
         unsafe { std::slice::from_raw_parts_mut(d.as_mut_ptr() as *mut f32, d.len() / 4) }
     }
     #[inline]
@@ -131,7 +131,10 @@ impl T {
     /// Mutable byte view. Clones the buffer only if it is shared.
     #[inline]
     pub fn dm(&mut self) -> &mut Vec<u8> {
-        Arc::make_mut(&mut self.d)
+        if Arc::get_mut(&mut self.d).is_none() {
+            self.d = Arc::new(align_bytes(&self.d));
+        }
+        Arc::get_mut(&mut self.d).unwrap()
     }
     pub fn scalar_f(&self) -> f32 {
         self.f()[0]

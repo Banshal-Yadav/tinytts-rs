@@ -20,6 +20,7 @@ pub mod arpabet;
 pub mod lexicon;
 pub mod numbers;
 pub mod rules;
+pub mod vocab;
 
 /// Result of converting one text to phonemes.
 pub struct G2pResult {
@@ -34,4 +35,11 @@ pub struct G2pResult {
 /// Convert English text to misaki phonemes.
 pub fn g2p(text: &str) -> G2pResult {
     rules::g2p(text)
+}
+
+/// Convert English text directly to token IDs for tinytts inference.
+pub fn g2p_ids(text: &str) -> (Vec<i64>, Vec<String>) {
+    let r = rules::g2p(text);
+    let ids = vocab::phonemes_to_ids(&r.phonemes);
+    (ids, r.oov)
 }

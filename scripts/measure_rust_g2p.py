@@ -13,8 +13,11 @@ import subprocess
 import sys
 import time
 
-REPO = r"C:\Users\bansa\OneDrive\Desktop\TTS-8M-model"
-EXE = r"C:\tts-target\release\g2p.exe"
+if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+EXE = os.environ.get("G2P_EXE", r"C:\tts-target\release\g2p.exe")
 
 refs = json.load(open(os.path.join(REPO, "heldout_ref.json"), encoding="utf-8"))
 num_pat = re.compile(r"\d")
@@ -36,11 +39,16 @@ def score(subset, label):
     exact = 0
     total_ref = 0
     total_err = 0
-    word_total = 0
     word_match = 0
     oov_count = 0
     mismatches = {}
     strip = ".,!?;:\"\u201c\u201d\u2018\u2019\u2026\u2014"
+    total_words = sum(
+        len([w.strip(strip) for w in r["phonemes"].split() if w.strip(strip)])
+        for r in subset
+    )
+    total_chars = sum(len(r["phonemes"]) for r in subset)
+
     for r in subset:
         try:
             p = subprocess.run([EXE, r["text"]], capture_output=True, timeout=30)
@@ -52,34 +60,33 @@ def score(subset, label):
         oov = 1 if oov_line.startswith("warning: OOV") else 0
         oov_count += oov
         ref = r["phonemes"]
+        rw = [w.strip(strip) for w in ref.split() if w.strip(strip)]
+        gw = [w.strip(strip) for w in got.split() if w.strip(strip)]
+
+        if oov:
+            total_err += len(ref)
+        else:
+            total_err += lev(got, ref)
+
         if not oov and got == ref:
             exact += 1
-            continue
-        total_ref += len(ref)
-        total_err += len(ref) if oov else lev(got, ref)
-        if not oov:
-            gw = [w.strip(strip) for w in got.split()]
-            rw = [w.strip(strip) for w in ref.split()]
+            word_match += len(rw)
+        else:
             sm = difflib.SequenceMatcher(a=gw, b=rw, autojunk=False)
             for tag, i1, i2, j1, j2 in sm.get_opcodes():
                 if tag == "equal":
-                    word_total += j2 - j1
                     word_match += j2 - j1
                 elif tag == "replace":
-                    word_total += max(j2 - j1, i2 - i1)
                     for k in range(min(j2 - j1, i2 - i1)):
                         key = (rw[j1 + k], gw[i1 + k])
                         mismatches[key] = mismatches.get(key, 0) + 1
-                elif tag == "delete":
-                    word_total += i2 - i1
-                elif tag == "insert":
-                    word_total += j2 - j1
+
     n = len(subset)
     print(f"--- {label}: {n} sentences ---")
     print(f"exact sentence match: {exact}/{n} = {100 * exact / n:.1f}%")
-    print(f"word-level phoneme match: {word_match}/{word_total} = "
-          f"{100 * word_match / max(1, word_total):.2f}%")
-    print(f"PER (all, OOV = full error): {100 * total_err / max(1, total_ref):.2f}%")
+    print(f"word-level phoneme match: {word_match}/{total_words} = "
+          f"{100 * word_match / max(1, total_words):.2f}%")
+    print(f"PER (all, OOV = full error): {100 * total_err / max(1, total_chars):.2f}%")
     print(f"sentences with OOV: {oov_count}")
     return mismatches
 

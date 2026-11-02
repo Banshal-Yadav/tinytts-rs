@@ -236,6 +236,117 @@ fn lexicon_lookup(word: &str) -> Option<&'static str> {
     })
 }
 
+/// misaki Lexicon._s (US English):
+/// if stem ends in voiceless consonant: + 's'
+/// if stem ends in sibilant (s, z, ʃ, ʒ, ʧ, ʤ): + 'ᵻz'
+/// else: + 'z'
+fn misaki_s(stem_ps: &str) -> String {
+    let mut out = stem_ps.to_string();
+    let last = match stem_ps.chars().last() {
+        Some(c) => c,
+        None => return out,
+    };
+    if matches!(last, 'p' | 't' | 'k' | 'f' | 'θ') {
+        out.push('s');
+    } else if matches!(last, 's' | 'z' | 'ʃ' | 'ʒ' | 'ʧ' | 'ʤ') {
+        out.push_str("ᵻz");
+    } else {
+        out.push('z');
+    }
+    out
+}
+
+/// Try splitting an OOV compound word into two known lexicon words.
+/// E.g. stonemasons -> stone + masons, treehouse -> tree + house.
+fn split_compound(word: &str) -> Option<String> {
+    let w = word.to_lowercase();
+    if w.len() < 6 || !w.chars().all(|c| c.is_ascii_alphabetic()) {
+        return None;
+    }
+    for i in 3..w.len() - 2 {
+        let w1 = &w[..i];
+        let w2 = &w[i..];
+        let ps1 = match lexicon_lookup(w1).map(|s| s.to_string()).or_else(|| cmu_lookup(w1)) {
+            Some(p) => p,
+            None => continue,
+        };
+        let mut ps2 = lexicon_lookup(w2).map(|s| s.to_string()).or_else(|| cmu_lookup(w2));
+        if ps2.is_none() && w2.ends_with('s') && !w2.ends_with("ss") {
+            let stem2 = &w2[..w2.len() - 1];
+            if let Some(p2) = lexicon_lookup(stem2).map(|s| s.to_string()).or_else(|| cmu_lookup(stem2)) {
+                ps2 = Some(misaki_s(&p2));
+            }
+        }
+        if let Some(ps2) = ps2 {
+            let joined = format!("{}{}", ps1, ps2);
+            return Some(arpabet::demote_later(&arpabet::flap_all(&joined)));
+        }
+    }
+    None
+}
+
+/// Simple rule-based English letter-to-sound fallback for OOV words.
+/// Never drops a word from output.
+fn letter_to_sound(word: &str) -> Option<String> {
+    const CONSONANTS: &[(&str, &str)] = &[
+        ("th", "θ"), ("sh", "ʃ"), ("ch", "ʧ"), ("ph", "f"), ("qu", "kw"), ("wh", "w"),
+        ("b", "b"), ("c", "k"), ("d", "d"), ("f", "f"), ("g", "ɡ"), ("h", "h"),
+        ("j", "ʤ"), ("k", "k"), ("l", "l"), ("m", "m"), ("n", "n"), ("p", "p"),
+        ("r", "ɹ"), ("s", "s"), ("t", "t"), ("v", "v"), ("w", "w"), ("x", "ks"),
+        ("z", "z"),
+    ];
+    const VOWELS_MAP: &[(&str, &str)] = &[
+        ("a", "æ"), ("e", "ɛ"), ("i", "ɪ"), ("o", "ɑ"), ("u", "ʌ"), ("y", "i"),
+    ];
+
+    let w = word.to_lowercase();
+    let mut out = String::new();
+    let mut i = 0;
+    let mut first_vowel = true;
+    while i < w.len() {
+        let rest = &w[i..];
+        let mut matched = false;
+        for &(pat, ph) in CONSONANTS {
+            if rest.starts_with(pat) {
+                out.push_str(ph);
+                i += pat.len();
+                matched = true;
+                break;
+            }
+        }
+        if matched {
+            continue;
+        }
+        for &(pat, ph) in VOWELS_MAP {
+            if rest.starts_with(pat) {
+                if first_vowel {
+                    out.push('ˈ');
+                    first_vowel = false;
+                }
+                out.push_str(ph);
+                i += pat.len();
+                matched = true;
+                break;
+            }
+        }
+        if matched {
+            continue;
+        }
+        let c = rest.chars().next()?;
+        if c.is_ascii_alphabetic() {
+            if let Some(sp) = spell_out(&c.to_string()) {
+                out.push_str(&sp);
+            }
+        }
+        i += c.len_utf8();
+    }
+    if out.is_empty() {
+        None
+    } else {
+        Some(arpabet::flap_all(&out))
+    }
+}
+
 /// Lexicon first, then CMU fallback. Used by the number-expansion path.
 fn word_phonemes_any(word: &str) -> Option<String> {
     if let Some(ps) = lexicon_lookup(word) {
@@ -312,7 +423,17 @@ fn next_word_phonemes(idx: usize, toks: &[Tok]) -> Option<String> {
                 }
                 return None;
             }
-            Tok::Number(_) | Tok::Other(_) => return None,
+            Tok::Number(n) => {
+                if let Some(words) = numbers::number_words(n) {
+                    if let Some(first) = words.first() {
+                        return lexicon_lookup(first)
+                            .map(|s| s.to_string())
+                            .or_else(|| cmu_lookup(&first.to_lowercase()));
+                    }
+                }
+                return None;
+            }
+            Tok::Other(_) => return None,
         }
     }
     None
@@ -476,33 +597,54 @@ pub fn g2p(text: &str) -> G2pResult {
                     continue;
                 }
                 if low == "to" {
-                    // misaki: tə before any word (consonant, vowel, or number)
-                    let mut nxt2: Option<&Tok> = toks.get(idx + 1);
-                    if matches!(nxt2, Some(Tok::Other(c)) if *c == '-' || *c == '\u{2014}') {
-                        nxt2 = toks.get(idx + 2);
-                    }
-                    let before_word = match nxt2 {
-                        Some(Tok::Word(n2)) => n2.chars().next().is_some(),
-                        Some(Tok::Number(_)) => true,
-                        _ => false,
-                    };
-                    if before_word {
-                        parts.push("tə".to_string());
+                    // misaki: {None: 'tu', False: 'tə', True: 'tʊ'}[ctx.future_vowel]
+                    let nxt_ps = next_word_phonemes(idx, &toks);
+                    if let Some(np) = nxt_ps {
+                        let clean = np.trim_start_matches(['ˈ', 'ˌ']);
+                        let vowel_start = clean
+                            .chars()
+                            .next()
+                            .map(|c| "AEIOUaeiɔɑʊɪɛəɐᵻæ".contains(c))
+                            .unwrap_or(false);
+                        if vowel_start {
+                            parts.push("tʊ".to_string());
+                        } else {
+                            parts.push("tə".to_string());
+                        }
                     } else {
                         parts.push("tu".to_string());
                     }
                     continue;
+                }
+                if low == "used" {
+                    let is_to = matches!(toks.get(idx + 1), Some(Tok::Word(w2)) if w2.eq_ignore_ascii_case("to"));
+                    if is_to {
+                        parts.push("jˈust".to_string());
+                        continue;
+                    }
                 }
                 if low == "i" {
                     parts.push("ˌI".to_string());
                     continue;
                 }
                 if low == "in" {
-                    parts.push("ɪn".to_string());
+                    // misaki: ˈɪn when stressed (sentence-final / before punct), ɪn otherwise
+                    let nxt_ps = next_word_phonemes(idx, &toks);
+                    if nxt_ps.is_none() {
+                        parts.push("ˈɪn".to_string());
+                    } else {
+                        parts.push("ɪn".to_string());
+                    }
                     continue;
                 }
                 if low == "there" {
-                    parts.push("ðˌɛɹ".to_string());
+                    // misaki: ðˌɛɹ DEFAULT, ðˈɛɹ with None tag (sentence-final or copula)
+                    let nxt_ps = next_word_phonemes(idx, &toks);
+                    if nxt_ps.is_none() {
+                        parts.push("ðˈɛɹ".to_string());
+                    } else {
+                        parts.push("ðˌɛɹ".to_string());
+                    }
                     continue;
                 }
                 if low == "am" {
@@ -514,40 +656,70 @@ pub fn g2p(text: &str) -> G2pResult {
                     sent_start = false;
                     continue;
                 }
-                // normal word: misaki, then CMU, then acronym spelling
+                // normal word: misaki, then possessive via misaki stem, then CMU
                 let mut ps = lexicon_lookup(w).map(|s| s.to_string());
+                // possessive 's against misaki lexicon first: boss's -> boss + ᵻz
+                if ps.is_none() && w.ends_with("'s") && w.len() > 2 {
+                    let stem = &w[..w.len() - 2];
+                    if let Some(sp) = lexicon_lookup(stem) {
+                        ps = Some(misaki_s(sp));
+                    }
+                }
+                // plural possessive: teachers' -> teachers
+                if ps.is_none() && w.ends_with("s'") && w.len() > 2 {
+                    let stem = &w[..w.len() - 1];
+                    if let Some(sp) = lexicon_lookup(stem) {
+                        ps = Some(sp.to_string());
+                    }
+                }
                 if ps.is_none() {
                     ps = cmu_lookup(&low);
+                }
+                // cmu-based possessive
+                if ps.is_none() && w.ends_with("'s") && w.len() > 2 {
+                    let stem = &w[..w.len() - 2];
+                    if let Some(sp) = cmu_lookup(&stem.to_lowercase()) {
+                        ps = Some(misaki_s(&sp));
+                    }
+                }
+                if ps.is_none() && w.ends_with("s'") && w.len() > 2 {
+                    let stem = &w[..w.len() - 1];
+                    if let Some(sp) = cmu_lookup(&stem.to_lowercase()) {
+                        ps = Some(sp);
+                    }
+                }
+                // compound splitting: stonemasons -> stone + masons
+                if ps.is_none() && w.len() >= 6 && w.chars().all(|c| c.is_ascii_alphabetic()) {
+                    ps = split_compound(w);
                 }
                 if w.chars().all(|c| c.is_ascii_uppercase()) && 1 < w.len() && w.len() <= 6 {
                     if let Some(sp) = spell_out(w) {
                         ps = Some(sp.replace(' ', ""));
                     }
                 }
-                match ps {
-                    None => {
-                        // the reference drops OOV words from the output and reports
-                        // them; the stderr warning keeps this non-silent.
-                        oov.push(w.clone());
-                    }
-                    Some(mut ps) => {
-                        // paradee final pass: all ɾ -> T (lexicon words too)
-                        ps = arpabet::flap_all(&ps);
-                        // cap stress for capitalized non-special words
-                        // (Python str.islower(): cased chars must be lower)
-                        let first_upper =
-                            w.chars().next().map(|c| c.is_uppercase()).unwrap_or(false);
-                        let rest: Vec<char> = w.chars().skip(1).collect();
-                        let rest_lower = rest.iter().any(|c| c.is_alphabetic())
-                            && rest
-                                .iter()
-                                .all(|c| !c.is_alphabetic() || c.is_lowercase());
-                        if first_upper && rest_lower && !ps.contains('ˈ') && !ps.contains('ˌ') {
-                            ps = arpabet::cap_stress(&ps);
-                        }
-                        parts.push(ps);
-                    }
+                // OOV fallback: rule-based letter-to-sound (never drop a word!)
+                if ps.is_none() {
+                    oov.push(w.clone());
+                    ps = letter_to_sound(w);
                 }
+                let Some(mut ps) = ps else {
+                    continue;
+                };
+                // paradee final pass: all ɾ -> T (lexicon words too)
+                ps = arpabet::flap_all(&ps);
+                // cap stress for capitalized non-special words
+                // (Python str.islower(): cased chars must be lower)
+                let first_upper =
+                    w.chars().next().map(|c| c.is_uppercase()).unwrap_or(false);
+                let rest: Vec<char> = w.chars().skip(1).collect();
+                let rest_lower = rest.iter().any(|c| c.is_alphabetic())
+                    && rest
+                        .iter()
+                        .all(|c| !c.is_alphabetic() || c.is_lowercase());
+                if first_upper && rest_lower && !ps.contains('ˈ') && !ps.contains('ˌ') {
+                    ps = arpabet::cap_stress(&ps);
+                }
+                parts.push(ps);
                 sent_start = false;
             }
         }
@@ -570,8 +742,41 @@ mod tests {
     #[test]
     fn lexicon_sentence() {
         let r = g2p("Hello there.");
-        assert_eq!(r.phonemes, "həlˈO ðˌɛɹ.");
+        assert_eq!(r.phonemes, "həlˈO ðˈɛɹ.");
         assert!(r.oov.is_empty());
+    }
+
+    #[test]
+    fn possessive_and_compound_rules() {
+        // bakery's -> bakery + 's -> bˈAkəɹiz
+        let r = g2p("the bakery's bread");
+        assert!(r.oov.is_empty(), "{:?}", r.oov);
+        assert!(r.phonemes.contains("bˈAkəɹiz"), "{}", r.phonemes);
+
+        // boss's -> boss + sibilant -> bˈɔsᵻz
+        let r = g2p("the boss's desk");
+        assert!(r.oov.is_empty(), "{:?}", r.oov);
+        assert!(r.phonemes.contains("bˈɔsᵻz"), "{}", r.phonemes);
+
+        // compound splitting: stonemasons -> stone + masons
+        let r = g2p("local stonemasons");
+        assert!(r.oov.is_empty(), "{:?}", r.oov);
+        assert!(r.phonemes.contains("stˈOnmˌAsᵊnz"), "{}", r.phonemes);
+
+        // OOV letter-to-sound: never dropped!
+        let r = g2p("zxqj");
+        assert_eq!(r.oov, vec!["zxqj".to_string()]);
+        assert!(!r.phonemes.is_empty(), "OOV word was dropped!");
+    }
+
+    #[test]
+    fn context_rules_to_and_used() {
+        // to before vowel sound -> tʊ
+        assert_eq!(g2p("to eat").phonemes, "tʊ ˈit");
+        // to before consonant sound -> tə
+        assert_eq!(g2p("to work").phonemes, "tə wˈɜɹk");
+        // used to -> jˈust tə
+        assert_eq!(g2p("used to go").phonemes, "jˈust tə ɡˌO");
     }
 
     #[test]

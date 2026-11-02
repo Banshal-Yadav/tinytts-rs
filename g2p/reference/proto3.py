@@ -141,6 +141,86 @@ def add_ed(stem):
 def add_ing(stem):
     return stem + ('IH0', 'NG')
 
+def misaki_s(stem_ps):
+    """misaki Lexicon._s (US English):
+    if stem ends in voiceless consonant: + 's'
+    if stem ends in sibilant (s, z, ʃ, ʒ, ʧ, ʤ): + 'ᵻz'
+    else: + 'z'
+    """
+    if not stem_ps:
+        return None
+    last = stem_ps[-1]
+    if last in 'ptkfθ':
+        return stem_ps + 's'
+    elif last in 'szʃʒʧʤ':
+        return stem_ps + 'ᵻz'
+    return stem_ps + 'z'
+
+
+def split_compound(word):
+    """Try splitting an OOV compound word into two known lexicon words.
+    E.g. stonemasons -> stone + masons, treehouse -> tree + house."""
+    w = word.lower()
+    if len(w) < 6 or not w.isalpha():
+        return None
+    for i in range(3, len(w) - 2):
+        w1 = w[:i]
+        w2 = w[i:]
+        ps1 = lexicon_lookup(w1) or cmu_lookup(w1)
+        if ps1 is None:
+            continue
+        ps2 = lexicon_lookup(w2) or cmu_lookup(w2)
+        if ps2 is None and w2.endswith('s') and not w2.endswith('ss'):
+            ps2_stem = lexicon_lookup(w2[:-1]) or cmu_lookup(w2[:-1])
+            if ps2_stem:
+                ps2 = misaki_s(ps2_stem)
+        if ps2:
+            return demote_later(flap_all(ps1 + ps2))
+    return None
+
+
+L2S_CONSONANTS = {
+    'th': 'θ', 'sh': 'ʃ', 'ch': 'ʧ', 'ph': 'f', 'qu': 'kw', 'wh': 'w',
+    'b': 'b', 'c': 'k', 'd': 'd', 'f': 'f', 'g': 'ɡ', 'h': 'h',
+    'j': 'ʤ', 'k': 'k', 'l': 'l', 'm': 'm', 'n': 'n', 'p': 'p',
+    'r': 'ɹ', 's': 's', 't': 't', 'v': 'v', 'w': 'w', 'x': 'ks',
+    'z': 'z'
+}
+L2S_VOWELS = {
+    'a': 'æ', 'e': 'ɛ', 'i': 'ɪ', 'o': 'ɑ', 'u': 'ʌ', 'y': 'i'
+}
+
+
+def letter_to_sound(word):
+    """Simple rule-based English letter-to-sound fallback for OOV words.
+    Never drops a word from output."""
+    w = word.lower()
+    out = []
+    i = 0
+    first_vowel = True
+    while i < len(w):
+        if i + 2 <= len(w) and w[i:i+2] in L2S_CONSONANTS:
+            out.append(L2S_CONSONANTS[w[i:i+2]])
+            i += 2
+        elif w[i] in L2S_CONSONANTS:
+            out.append(L2S_CONSONANTS[w[i]])
+            i += 1
+        elif w[i] in L2S_VOWELS:
+            if first_vowel:
+                out.append('ˈ')
+                first_vowel = False
+            out.append(L2S_VOWELS[w[i]])
+            i += 1
+        elif w[i].isalpha():
+            ps = spell_out(w[i])
+            if ps:
+                out.append(ps)
+            i += 1
+        else:
+            i += 1
+    return flap_all(''.join(out)) if out else None
+
+
 def cmu_lookup(word):
     w = word.lower()
     phones = CMU.get(w)
@@ -525,15 +605,22 @@ def g2p(text):
             out.append(('ðɪs', True))
             continue
         if low == 'to':
-            # misaki: tə before any word (consonant, vowel, or number)
-            nxt2 = nxt
-            if nxt2 in ('-', '—') and idx + 2 < len(tokens):
-                nxt2 = tokens[idx + 2]
-            if nxt2 and (nxt2[0].isalpha() or nxt2[0].isdigit()):
-                out.append(('tə', True))
+            # misaki: {None: 'tu', False: 'tə', True: 'tʊ'}[ctx.future_vowel]
+            nxt_ps = next_word_phonemes(idx, tokens)
+            if nxt_ps:
+                nxt_clean = nxt_ps.lstrip('ˈˌ')
+                if nxt_clean and nxt_clean[0] in 'AEIOUaeiɔɑʊɪɛəɐᵻæ':
+                    out.append(('tʊ', True))
+                else:
+                    out.append(('tə', True))
             else:
                 out.append(('tu', True))
             continue
+        if low == 'used':
+            nxt_tok = tokens[idx + 1].lower() if idx + 1 < len(tokens) else ''
+            if nxt_tok == 'to':
+                out.append(('jˈust', True))
+                continue
         if tok.startswith('-') and re.fullmatch(r'\d+', tok[1:]):
             # negative number: -7 -> minus seven
             out.append(('mˈInəs', True))
@@ -554,12 +641,20 @@ def g2p(text):
             out.append(('ˌI', True))
             continue
         if low == 'in':
-            # misaki: ˈɪn when stressed (not tagged IN), ɪn as preposition
-            out.append(('ɪn', True))
+            # misaki: ˈɪn when stressed (sentence-final / before punct), ɪn otherwise
+            nxt_ps = next_word_phonemes(idx, tokens)
+            if nxt_ps is None:
+                out.append(('ˈɪn', True))
+            else:
+                out.append(('ɪn', True))
             continue
         if low == 'there':
             # misaki: ðˌɛɹ DEFAULT, ðˈɛɹ with None tag (sentence-final or copula)
-            out.append(('ðˌɛɹ', True))
+            nxt_ps = next_word_phonemes(idx, tokens)
+            if nxt_ps is None:
+                out.append(('ðˈɛɹ', True))
+            else:
+                out.append(('ðˌɛɹ', True))
             continue
         if low == 'am':
             out.append(('ɐm', True))
@@ -569,15 +664,45 @@ def g2p(text):
             sent_start = False
             continue
         ps = lexicon_lookup(tok)
+        # possessive 's against misaki lexicon first: boss's -> boss + ᵻz
+        if ps is None and tok.endswith("'s") and len(tok) > 2:
+            stem = tok[:-2]
+            stem_ps = lexicon_lookup(stem)
+            if stem_ps:
+                ps = misaki_s(stem_ps)
+        # plural possessive: teachers' -> teachers
+        if ps is None and tok.endswith("s'") and len(tok) > 2:
+            stem = tok[:-1]
+            stem_ps = lexicon_lookup(stem)
+            if stem_ps:
+                ps = stem_ps
+        # cmu fallback
         if ps is None:
             ps = cmu_lookup(tok)
+        # cmu-based possessive
+        if ps is None and tok.endswith("'s") and len(tok) > 2:
+            stem = tok[:-2]
+            stem_ps = cmu_lookup(stem)
+            if stem_ps:
+                ps = misaki_s(stem_ps)
+        if ps is None and tok.endswith("s'") and len(tok) > 2:
+            stem = tok[:-1]
+            stem_ps = cmu_lookup(stem)
+            if stem_ps:
+                ps = stem_ps
+        # compound splitting: stonemasons -> stone + masons
+        if ps is None and len(tok) >= 6 and tok.isalpha():
+            ps = split_compound(tok)
         # acronym spelling: letters joined without spaces, stress kept
         if tok.isupper() and 1 < len(tok) <= 6:
             ps = spell_out(tok)
             if ps is not None:
                 ps = ps.replace(' ', '')
+        # OOV fallback: rule-based letter-to-sound (never drop a word!)
         if ps is None:
             oov.append(tok)
+            ps = letter_to_sound(tok)
+        if ps is None:
             continue
         # paradee final pass: all ɾ -> T (applies to lexicon entries too)
         ps = flap_all(ps)

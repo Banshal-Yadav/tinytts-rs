@@ -46,6 +46,7 @@ scripts/liveness.json
 
 # Generated audio samples (timestamped). Not tracked.
 audio_out/
+samples/say.wav
 
 # Interleaved A/B benchmark worktrees and their target dirs
 .abwork/
@@ -54,6 +55,10 @@ docs/benchmark.json
 
 # Instructions for AI coding agents. Not part of the published repository.
 AGENTS.md
+
+# Internal engineering docs (optimization log, benchmark tables, research
+# notes, testing harness). Kept local, not published.
+docs/
 
 # tinytts-g2p embedded lexicon (12.8 MB, generated). Regenerate with:
 #   python g2p/gen_lexicon.py g2p/src/lexicon.bin
@@ -65,3 +70,9 @@ g2p/src/lexicon.bin
 # (see g2p/THIRD_PARTY_NOTICES.md for the license and regeneration steps)
 g2p/cmudict.dict
 g2p/reference/cmudict.dict
+
+# Text inputs and samples not part of the repo.
+text/
+
+# Agent experiment notes (failed patches, failure records). Not part of the repo.
+agent-notes/

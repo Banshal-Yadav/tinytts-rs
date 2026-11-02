@@ -67,8 +67,15 @@ pub fn convert(phones: &[&str]) -> Option<String> {
             let m = map_lookup(MAP, base)?;
             if stress == "0" {
                 if base == "IH" {
-                    // misaki reduces unstressed IH to ə in CMU fallback words
-                    sym = "ə".to_string();
+                    let next_d_or_z = i + 1 < n && {
+                        let b1 = phones[i + 1].trim_end_matches(|c| ('0'..='2').contains(&c));
+                        (b1 == "D" || b1 == "Z") && i + 1 == n - 1
+                    };
+                    if next_d_or_z {
+                        sym = "ᵻ".to_string();
+                    } else {
+                        sym = "ə".to_string();
+                    }
                 } else if base == "AH" {
                     // AH0 -> ᵊ before nasal+consonant (applicants, questions)
                     let next_nasal = i + 2 < n && {

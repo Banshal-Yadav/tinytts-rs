@@ -1,6 +1,6 @@
 //! Per-node differential test against ONNX Runtime golden tensors.
 //!
-//! Golden files are produced once by `scripts/verify/dump_golden.py` (see docs/TESTING.md).
+//! Golden files are produced once by `scripts/verify/dump_golden.py`.
 //! This test needs neither Python nor onnxruntime at run time.
 //!
 //! Two modes:
@@ -94,7 +94,7 @@ fn to_t(n: &npy::Npy) -> T {
     T {
         dt,
         dims: n.shape.clone(),
-        d: n.data.clone().into(),
+        d: std::sync::Arc::new(tinytts::tensor::align_bytes(&n.data)),
     }
 }
 

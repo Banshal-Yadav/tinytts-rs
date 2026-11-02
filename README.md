@@ -148,9 +148,6 @@ The first working version of this runtime, before any optimization, ran the same
 | fuse the `/head` sine-excitation chain | 676 -> 567 ms, RSS 126 -> 80 MB |
 | lazy dequantization, refcounted tensor data | loaded RSS 31.8 -> 15.4 MB |
 
-`docs/PERFORMANCE_NOTES.md` has the full record, including what was tried and
-did not help.
-
 ## Getting the model
 
 The weights are **not** in this repository. Download them from Hugging Face:
@@ -262,15 +259,6 @@ python scripts/verify/gate.py                                          # all thr
 cd runtime
 cargo test --release
 ```
-
-See `docs/TESTING.md` for what each mode checks and the tolerances.
-
-## Documentation
-
-- `docs/ARCHITECTURE.md` - how the runtime is put together
-- `docs/BENCHMARKS.md` - the measured tables and how to reproduce them
-- `docs/TESTING.md` - the golden harness and the regression gate
-- `docs/PERFORMANCE_NOTES.md` - what was tried, what helped, what did not
 
 ## Credits
 
