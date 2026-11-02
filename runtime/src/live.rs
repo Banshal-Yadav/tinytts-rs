@@ -52,13 +52,22 @@ use mem::{rss_mb, peak_rss_mb};
 const SAMPLE_RATE: u32 = 24000;
 const CHUNK_MAX_TOKENS: usize = 80;
 const CROSSFADE_SAMPLES: usize = 240;
-const RING_BUFFER_CAPACITY: usize = 48000;
+// Interleaved device-rate samples the producer may run ahead of playback.
+// ~10.9 s at 48 kHz stereo: enough to absorb a whole burst of chunks, so the
+// writer is never in a race with the audio callback. (Was 48000 = 0.68 s,
+// which forced the producer to track the device sample by sample.)
+const RING_BUFFER_CAPACITY: usize = 1 << 20;
+// Time for the device to play out whatever it already copied out of the ring.
+const DEVICE_DRAIN_MS: u64 = 300;
+// Give up on playback if the device hasn't consumed a single sample for this long.
+const STALL_ABORT_MS: u64 = 3000;
 
 struct RingBuffer {
     buffer: *mut f32,
     capacity: usize,
     head: AtomicUsize,
     tail: AtomicUsize,
+    underruns: AtomicUsize,
 }
 
 impl RingBuffer {
@@ -67,8 +76,9 @@ impl RingBuffer {
         let mut v = vec![0.0f32; cap];
         let ptr = v.as_mut_ptr();
         std::mem::forget(v);
-        Self { buffer: ptr, capacity: cap, head: AtomicUsize::new(0), tail: AtomicUsize::new(0) }
+        Self { buffer: ptr, capacity: cap, head: AtomicUsize::new(0), tail: AtomicUsize::new(0), underruns: AtomicUsize::new(0) }
     }
+    fn underrun_count(&self) -> usize { self.underruns.load(Ordering::Relaxed) }
     #[inline] fn mask(&self) -> usize { self.capacity - 1 }
     #[inline] fn available_read(&self) -> usize {
         let h = self.head.load(Ordering::Acquire);
@@ -92,13 +102,27 @@ impl RingBuffer {
         self.head.store(h.wrapping_add(to_write), Ordering::Release);
         to_write
     }
-    fn write(&self, src: &[f32], stop: &AtomicBool) {
+    /// Producer side. Blocks while the ring is full, but never indefinitely:
+    /// if playback stops consuming (dead stream / unplugged device) it gives up
+    /// after `STALL_ABORT_MS` and reports, instead of hanging the terminal.
+    fn write(&self, src: &[f32], stop: &AtomicBool) -> usize {
         let mut w = 0;
+        let mut last_tail = self.tail.load(Ordering::Acquire);
+        let mut idle_ms = 0u32;
         while w < src.len() && !stop.load(Ordering::Acquire) {
             let n = self.try_write(&src[w..]);
-            if n == 0 { thread::sleep(Duration::from_millis(1)); continue; }
-            w += n;
+            if n > 0 { w += n; idle_ms = 0; last_tail = self.tail.load(Ordering::Acquire); continue; }
+            thread::sleep(Duration::from_millis(1));
+            let t = self.tail.load(Ordering::Acquire);
+            if t == last_tail {
+                idle_ms += 1;
+                if idle_ms >= STALL_ABORT_MS as u32 {
+                    eprintln!("[live] WARN: playback stalled, dropping {} samples", src.len() - w);
+                    return w;
+                }
+            } else { idle_ms = 0; last_tail = t; }
         }
+        w
     }
     fn try_read(&self, dst: &mut [f32]) -> usize {
         let h = self.head.load(Ordering::Acquire);
@@ -117,14 +141,16 @@ impl RingBuffer {
         self.tail.store(t.wrapping_add(to_read), Ordering::Release);
         to_read
     }
-    fn read(&self, dst: &mut [f32], stop: &AtomicBool) {
-        let mut r = 0;
-        while r < dst.len() && !stop.load(Ordering::Acquire) {
-            let n = self.try_read(&mut dst[r..]);
-            if n == 0 { thread::sleep(Duration::from_millis(1)); continue; }
-            r += n;
+    /// Audio-callback path. MUST NOT BLOCK: an audio callback that misses its
+    /// deadline gets the stream torn down by the driver, which is why playback
+    /// used to die at a random word. Underruns become silence, not a stall.
+    fn read(&self, dst: &mut [f32]) -> usize {
+        let n = self.try_read(dst);
+        if n < dst.len() {
+            dst[n..].fill(0.0);
+            self.underruns.fetch_add(1, Ordering::Relaxed);
         }
-        if r < dst.len() { dst[r..].fill(0.0); }
+        n
     }
 }
 
@@ -145,12 +171,6 @@ fn split_chunks(ids: &[i64], max: usize) -> Vec<Vec<i64>> {
         if !part.is_empty() { chunks.push(part); }
     }
     chunks.into_iter().map(|mut c| { let mut v=Vec::with_capacity(c.len()+2); v.push(0); v.append(&mut c); v.push(0); v }).collect()
-}
-
-fn crossfade(a: &mut [f32], b: &[f32], xf: usize) {
-    if a.len()<xf || b.len()<xf || xf==0 { return; }
-    let n = a.len();
-    for i in 0..xf { let w=i as f32/xf as f32; a[n-xf+i]=a[n-xf+i]*(1.0-w)+b[i]*w; }
 }
 
 fn synth_chunk(m: &graph::Model, e: &mut exec::Exec, ids: &[i64]) -> Vec<f32> {
@@ -226,9 +246,9 @@ fn main() {
 
     let ring = Arc::new(RingBuffer::new(RING_BUFFER_CAPACITY));
     let stop = Arc::new(AtomicBool::new(false));
-    let (rc, sc) = (ring.clone(), stop.clone());
+    let rc = ring.clone();
     let stream = device.build_output_stream(&config.into(),
-        move |data: &mut [f32], _| { rc.read(data, &sc); },
+        move |data: &mut [f32], _| { rc.read(data); },
         |e| eprintln!("[live] stream error: {e}"), None).expect("stream");
     stream.play().expect("play");
     eprintln!("[live] ready. Type sentences and press Enter. Ctrl+C to quit.");
@@ -241,28 +261,51 @@ fn main() {
         if !oov.is_empty() { eprintln!("[live] OOV: {}", oov.join(", ")); }
         let chunks = split_chunks(&ids, chunk_max);
         if chunks.is_empty() { eprintln!("[live] no tokens for line {line_num}"); continue; }
-        let t_first = Instant::now(); let mut first=false; let mut tot_synth=0.0; let mut tot_samp=0usize; let mut prev: Option<Vec<f32>> = None;
+        let t_first = Instant::now(); let mut first=false; let mut tot_synth=0.0; let mut tot_samp=0usize;
+        // Tail of the previous chunk, held back so the next chunk's head can be
+        // overlap-added onto it. (The old code blended the *new* chunk's tail
+        // with the *old* chunk's head, which is not a crossfade at all.)
+        let mut pending: Option<Vec<f32>> = None;
         for (ci, ch) in chunks.iter().enumerate() {
             let t_s = Instant::now(); let audio = synth_chunk(&m, &mut e, ch); let s_ms = t_s.elapsed().as_secs_f64()*1e3;
             tot_synth+=s_ms;
             let mut ca = audio;
-            if let Some(p)=prev.take() { crossfade(&mut ca, &p, CROSSFADE_SAMPLES); }
             if need_resample { ca = resample(&ca, SAMPLE_RATE, device_rate); }
             if need_interleave { ca = interleave_stereo(&ca); }
             tot_samp += ca.len();
-            prev = Some(ca.clone());
-            ring.write(&ca, &stop);
+            let hl = CROSSFADE_SAMPLES.min(ca.len() / 2);
+            if let Some(t) = pending.take() {
+                let n = hl.min(t.len());
+                for i in 0..n { let w = i as f32 / n as f32; ca[i] = t[i] * (1.0 - w) + ca[i] * w; }
+            }
+            let end = ca.len() - hl;
+            ring.write(&ca[..end], &stop);
+            pending = Some(ca[end..].to_vec());
             if !first { let tf = t_first.elapsed().as_secs_f64()*1e3; eprintln!("[live] line {line_num}: first audio at {tf:.1} ms (chunk {}/{})", ci+1, chunks.len()); first=true; }
             let mono_ca = ca.len() / channels as usize;
             eprintln!("[live]   chunk {}/{}: {} tokens -> {} frames ({:.2}s) in {:.1} ms", ci+1, chunks.len(), ch.len(), ca.len(), mono_ca as f64/device_rate as f64, s_ms);
         }
-        while ring.available_read()>0 && !stop.load(Ordering::Acquire) { thread::sleep(Duration::from_millis(10)); }
+        if let Some(t) = pending.take() { ring.write(&t, &stop); }
+        // Wait for playback to consume the queue, then give the device time to
+        // play out what it already copied (available_read()==0 means "copied",
+        // not "heard"). Bail out with a warning if the stream has died.
+        let mut last = ring.available_read(); let mut idle = 0u32;
+        while ring.available_read() > 0 && !stop.load(Ordering::Acquire) {
+            thread::sleep(Duration::from_millis(10));
+            let now = ring.available_read();
+            if now >= last {
+                idle += 1;
+                if idle as u64 >= STALL_ABORT_MS / 10 { eprintln!("[live] WARN: playback stalled with {now} samples queued"); break; }
+            } else { idle = 0; }
+            last = now;
+        }
+        thread::sleep(Duration::from_millis(DEVICE_DRAIN_MS));
         // tot_samp is interleaved frames at device_rate; mono frames = tot_samp / channels
         // duration = mono_frames / device_rate (since resample already happened)
         let mono_frames = tot_samp / channels as usize;
         let dur = mono_frames as f64 / device_rate as f64;
         let rtf = dur / (tot_synth / 1000.0);
-        eprintln!("[live] line {line_num} done: g2p={t_g2p_ms:.1}ms synth={tot_synth:.1}ms audio={dur:.2}s RTF={rtf:.2}x rss={:.1}MB peak={:.1}MB", rss_mb(), peak_rss_mb());
+        eprintln!("[live] line {line_num} done: g2p={t_g2p_ms:.1}ms synth={tot_synth:.1}ms audio={dur:.2}s RTF={rtf:.2}x rss={:.1}MB peak={:.1}MB underruns={}", rss_mb(), peak_rss_mb(), ring.underrun_count());
     }
     stop.store(true, Ordering::Release); stream.pause().ok(); 
     eprintln!("[live] stopped rss={:.1}MB peak={:.1}MB", rss_mb(), peak_rss_mb());
