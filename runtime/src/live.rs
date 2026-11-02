@@ -173,23 +173,24 @@ fn split_chunks(ids: &[i64], max: usize) -> Vec<Vec<i64>> {
     chunks.into_iter().map(|mut c| { let mut v=Vec::with_capacity(c.len()+2); v.push(0); v.append(&mut c); v.push(0); v }).collect()
 }
 
-fn synth_chunk(m: &graph::Model, e: &mut exec::Exec, ids: &[i64]) -> Vec<f32> {
+fn synth_chunk(m: &graph::Model, e: &mut exec::Exec, ids: &[i64], speed: f32) -> Vec<f32> {
     let n = ids.len();
     let outs = e.run_freeing(m, vec![
         ("input_ids".into(), tensor::T::from_i64(vec![1,n], ids.to_vec())),
-        ("speed".into(), tensor::T::from_f32(vec![1], vec![1.0])),
+        ("speed".into(), tensor::T::from_f32(vec![1], vec![speed])),
     ]);
     outs[0].f().to_vec()
 }
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let model = args.get(1).expect("usage: tinytts-live <model.onnx> [--chunk N] [--device NAME]");
-    let mut chunk_max = CHUNK_MAX_TOKENS; let mut dev = None; let mut i=2;
+    let model = args.get(1).expect("usage: tinytts-live <model.onnx> [--chunk N] [--device NAME] [--speed F]");
+    let mut chunk_max = CHUNK_MAX_TOKENS; let mut dev = None; let mut speed = 1.0f32; let mut i=2;
     while i < args.len() {
         match args[i].as_str() {
             "--chunk" => { if let Some(v)=args.get(i+1).and_then(|s|s.parse().ok()) { chunk_max=v; } i+=2; }
             "--device" => { dev=args.get(i+1).cloned(); i+=2; }
+            "--speed" => { if let Some(v)=args.get(i+1).and_then(|s|s.parse().ok()) { speed=v; } i+=2; }
             _ => i+=1,
         }
     }
@@ -198,7 +199,7 @@ fn main() {
     let m = graph::Model::new(g);
     eprintln!("[live] model loaded in {:.1} ms (nodes={}, inits={})", t0.elapsed().as_secs_f64()*1e3, m.g.nodes.len(), m.g.inits.len());
     let mut e = exec::Exec::new(); e.free_dead = true;
-    let _ = synth_chunk(&m, &mut e, &[0,16,43,44,45,16,4,0]);
+    let _ = synth_chunk(&m, &mut e, &[0,16,43,44,45,16,4,0], 1.0);
     eprintln!("[live] warm-up done");
     eprintln!("[live] rss after warmup: {:.1} MB (peak: {:.1} MB)", rss_mb(), peak_rss_mb());
     let host = cpal::default_host();
@@ -267,7 +268,7 @@ fn main() {
         // with the *old* chunk's head, which is not a crossfade at all.)
         let mut pending: Option<Vec<f32>> = None;
         for (ci, ch) in chunks.iter().enumerate() {
-            let t_s = Instant::now(); let audio = synth_chunk(&m, &mut e, ch); let s_ms = t_s.elapsed().as_secs_f64()*1e3;
+            let t_s = Instant::now(); let audio = synth_chunk(&m, &mut e, ch, speed); let s_ms = t_s.elapsed().as_secs_f64()*1e3;
             tot_synth+=s_ms;
             let mut ca = audio;
             if need_resample { ca = resample(&ca, SAMPLE_RATE, device_rate); }
