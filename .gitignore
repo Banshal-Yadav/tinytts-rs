@@ -73,8 +73,8 @@ g2p/reference/cmudict.dict
 
 # Text inputs and samples not part of the repo.
 text/
-g2p/dev/*.json
-g2p/dev/*.txt
+g2p/dev/
+g2p/target/
 
 # Agent experiment notes (failed patches, failure records). Not part of the repo.
 agent-notes/
