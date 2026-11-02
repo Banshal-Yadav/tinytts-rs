@@ -73,6 +73,34 @@ ids = [0] + [tts.vocab[c] for c in tts.phonemize("Hello there.")] + [0]
 `scripts/user/gen_audio.py` shows the same thing end to end. Feeding raw characters
 or eSpeak phonemes produces wrong audio, not an error.
 
+## G2P front-end (Rust)
+
+This repository includes a **G2P CLI** that converts English text directly to token IDs:
+
+```bash
+# English → token IDs (for TinyTTS)
+g2p/target/release/g2p.exe --ids "Hello there."
+# → 0 50 83 16 46 51 16 4 0
+
+# English → phonemes (for reference)
+g2p/target/release/g2p.exe "Hello there."
+# → həloʊ ðɛɹ
+```
+
+The `tinytts_g2p` crate exposes a public API:
+
+```rust
+use tinytts_g2p::g2p_ids;
+let ids = g2p_ids("The quick brown fox jumps over the lazy dog.");
+// Returns Vec<i64> of token IDs wrapped in BOS/EOS (0)
+```
+
+`g2p/src/vocab.rs` contains the IPA → token ID mapping, generated from `vocab.txt`.
+
+**G2P Performance:**
+- Held-out accuracy: 66.7% exact sentences, 97.3% word match
+- Zero OOV on the test set
+
 ## Measured performance
 
 Machine: AMD Ryzen 7 7735HS (Zen 3+, 8C/16T), 16 GB DDR5-5600, Windows 11,
