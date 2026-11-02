@@ -94,6 +94,18 @@ fn g2p(text: &str) -> G2pResult;
 fn g2p_ids(text: &str) -> (Vec<i64>, Vec<String>);
 ```
 
+```rust
+use tinytts_g2p::g2p_ids;
+let ids = g2p_ids("The quick brown fox jumps over the lazy dog.");
+// Returns Vec<i64> of token IDs wrapped in BOS/EOS (0)
+```
+
+`g2p/src/vocab.rs` contains the IPA → token ID mapping, generated from `vocab.txt`.
+
+**G2P Performance:**
+- Held-out accuracy: 66.7% exact sentences, 97.3% word match
+- Zero OOV on the test set
+
 ## Live Streaming TTS (`tinytts-live`)
 
 A separate binary that loads model + G2P once, reads stdin line-by-line, and streams audio directly to speakers — no files, no external players.
@@ -132,16 +144,6 @@ Type sentences, press Enter, hear audio immediately. Ctrl+C to quit.
 See [`LIVE.md`](LIVE.md) for full documentation, options, and architecture.
 
 The core `tinytts` binary remains **542 KB, zero dependencies**. `tinytts-live` is a separate binary that adds `cpal` + `winapi` + `tinytts-g2p` for the streaming CLI use case.
-use tinytts_g2p::g2p_ids;
-let ids = g2p_ids("The quick brown fox jumps over the lazy dog.");
-// Returns Vec<i64> of token IDs wrapped in BOS/EOS (0)
-```
-
-`g2p/src/vocab.rs` contains the IPA → token ID mapping, generated from `vocab.txt`.
-
-**G2P Performance:**
-- Held-out accuracy: 66.7% exact sentences, 97.3% word match
-- Zero OOV on the test set
 
 ## Measured performance
 
