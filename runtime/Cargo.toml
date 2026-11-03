@@ -25,7 +25,7 @@ path = "src/live.rs"
 [dependencies]
 cpal = { version = "0.15", features = ["jack"] }
 tinytts-g2p = { path = "../g2p" }
-winapi = { version = "0.3", features = ["psapi", "processthreadsapi"] }
+winapi = { version = "0.3", features = ["psapi", "processthreadsapi", "winbase"] }
 
 [profile.release]
 opt-level = 3
